@@ -39,7 +39,7 @@ namespace FrOnDaL_Lux
 
             _q.SetSkillshot(0.250f, 70f, 1300f, true, SkillshotType.Line);
             _w.SetSkillshot(0.25f, 150f, 1200f, false, SkillshotType.Line);
-            _e.SetSkillshot(0.250f, 275f, 1300f, false, SkillshotType.Circle);
+            _e.SetSkillshot(0.25f, 275f, 1050f, false, SkillshotType.Circle);
             _r.SetSkillshot(1f, 150f, float.MaxValue, false, SkillshotType.Circle);
             
             Orbwalker.Attach(Main);
@@ -183,10 +183,14 @@ namespace FrOnDaL_Lux
             if (Main["combo"]["e"].As<MenuBool>().Enabled && _e.Ready)
             {
                 var target = TargetSelector.GetTarget(_e.Range);
-                if (target == null) return;
-                if (target.CountEnemyHeroesInRange(_e.Width) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value)
+                if (target == null) return; 
+                var prediction = _e.GetPrediction(target);
+                if (target.CountEnemyHeroesInRange(_e.Width) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value && _e.Ready)
                 {
-                    _e.Cast(target);
+                    if (prediction.HitChance >= HitChance.High)
+                    {                       
+                        _e.Cast(prediction.CastPosition);
+                    }
                 }
             }
 
