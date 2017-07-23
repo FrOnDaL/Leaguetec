@@ -141,7 +141,7 @@ namespace FrOnDaL_Lux
             if (Main["combo"]["w"].As<MenuSliderBool>().Enabled && Lux.ManaPercent() > Main["combo"]["w"].As<MenuSliderBool>().Value && Lux.HealthPercent() <= Main["combo"]["wProtect"].As<MenuSlider>().Value)
             {
                 var target = TargetSelector.GetTarget(1200);
-                if (target == null) return;
+                if (target == null) return; 
                 if (Lux.CountEnemyHeroesInRange(750) >= 1)
                 {
                     _w.Cast(target); // target :D :D
@@ -247,7 +247,7 @@ namespace FrOnDaL_Lux
 
         public static List<Obj_AI_Minion> GetGenericJungleMinionsTargetsInRange(float range)
         {
-            return GameObjects.Jungle.Where(m => !GameObjects.JungleSmall.Contains(m) && m.IsValidTarget(range)).ToList();
+            return GameObjects.Jungle.Where(x => (GameObjects.JungleSmall.Contains(x) || GameObjects.JungleLarge.Contains(x) || GameObjects.JungleLegendary.Contains(x)) && x.IsValidTarget(range)).ToList();
         }
 
         /*JungleClear*/
@@ -257,7 +257,7 @@ namespace FrOnDaL_Lux
             {
                 foreach (var jungleTarget in GetGenericJungleMinionsTargetsInRange(_q.Range))
                 {
-                    if (jungleTarget.IsValidTarget(_q.Range))
+                    if (jungleTarget.IsValidTarget(_q.Range) && GetGenericJungleMinionsTargets().Contains(jungleTarget) && jungleTarget.IsValidSpellTarget())
                     {
                         _q.Cast(jungleTarget);
                     }
@@ -268,7 +268,7 @@ namespace FrOnDaL_Lux
             {
                 foreach (var jungleTarget in GetGenericJungleMinionsTargetsInRange(_e.Range))
                 {
-                    if (jungleTarget.IsValidTarget(_e.Range))
+                    if (jungleTarget.IsValidTarget(_e.Range) && GetGenericJungleMinionsTargets().Contains(jungleTarget) && jungleTarget.IsValidSpellTarget())
                     {
                         _e.Cast(jungleTarget);
                     }
