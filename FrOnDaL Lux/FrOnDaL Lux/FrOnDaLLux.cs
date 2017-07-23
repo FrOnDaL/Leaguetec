@@ -49,8 +49,9 @@ namespace FrOnDaL_Lux
             {
                 new MenuBool("q", "Use Combo Q"),
                 new MenuList("qHit", "Q Hitchances", new []{ "Low", "Medium", "High", "VeryHigh", "Dashing", "Immobile" }, 1),
-                new MenuSliderBool("w", "Use Auto W / if Mana >= x%", false, 60, 0, 99),
-                new MenuSlider("wProtect", "Use W Lux Heal <= x%", 50, 1, 99),
+                new MenuBool("w", "Use Combo W"),
+                new MenuSliderBool("wAuto", "Use Auto W / if Mana >= x%", false, 60, 0, 99),
+                new MenuSlider("wProtect", "Use W Ally Heal <= x%", 50, 1, 99),
                 new MenuBool("e", "Use Combo E"),
                 new MenuList("eHit", "E Hitchances", new []{ "Low", "Medium", "High", "VeryHigh", "Dashing", "Immobile" }, 1),
                 new MenuSlider("UnitsEhit", "E Hit x Units Enemy", 1, 1, 3),
@@ -147,16 +148,19 @@ namespace FrOnDaL_Lux
             }
             if (Main["harass"]["autoHarass"].As<MenuBool>().Enabled)
             {
-                Harass();
+                Harass();              
             }
-            if (Main["combo"]["w"].As<MenuSliderBool>().Enabled && Lux.ManaPercent() > Main["combo"]["w"].As<MenuSliderBool>().Value && Lux.HealthPercent() <= Main["combo"]["wProtect"].As<MenuSlider>().Value)
+            if (Main["combo"]["wAuto"].As<MenuSliderBool>().Enabled && Lux.ManaPercent() > Main["combo"]["wAuto"].As<MenuSliderBool>().Value && Orbwalker.Mode != OrbwalkingMode.Combo)
             {
-                var target = TargetSelector.GetTarget(1200);
-                if (target == null) return; 
-                if (Lux.CountEnemyHeroesInRange(750) >= 1)
+                foreach (var ally in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsInRange(_w.Range) && x.IsAlly && x.HealthPercent() <= Main["combo"]["wProtect"].Value && x.CountEnemyHeroesInRange(750) >= 1))
                 {
-                    _w.Cast(target); // target :D :D
-                }             
+                    if (ally.IsInRange(_w.Range) && !Lux.IsRecalling())
+                    {
+                        _w.CastOnUnit(ally);
+                    }
+                }
+
+
             }
             if (_r.Ready && Main["combo"]["keyR"].As<MenuKeyBind>().Enabled)
             {
@@ -192,6 +196,17 @@ namespace FrOnDaL_Lux
                 if (target == null) return;                
                     _q.Cast(target);
                 
+            }
+
+            if (Main["combo"]["w"].As<MenuBool>().Enabled && _w.Ready)
+            {
+                foreach (var ally in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsInRange(_w.Range) && x.IsAlly && x.HealthPercent() <= Main["combo"]["wProtect"].Value && x.CountEnemyHeroesInRange(750) >= 1))
+                {
+                    if (ally.IsInRange(_w.Range) && !Lux.IsRecalling())
+                    {
+                        _w.CastOnUnit(ally);
+                    }
+                }
             }
 
             if (!Main["combo"]["r"].As<MenuBool>().Enabled || !_r.Ready) return;
@@ -303,7 +318,6 @@ namespace FrOnDaL_Lux
                             barPos.Y += yOffset;
                             var drawEndXPos = barPos.X + width * (unit.HealthPercent() / 100);
                             var drawStartXPos = (float)(barPos.X + (unit.Health > Lux.GetSpellDamage(unit, SpellSlot.R) ? width *((unit.Health - Lux.GetSpellDamage(unit, SpellSlot.R)) / unit.MaxHealth * 100 / 100) : 0));
-
                             Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, unit.Health < Lux.GetSpellDamage(unit, SpellSlot.R) ? Color.GreenYellow : Color.ForestGreen);
                         });
             }
