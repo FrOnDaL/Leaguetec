@@ -49,7 +49,7 @@ namespace FrOnDaL_Lux
             {
                 new MenuBool("q", "Use Combo Q"),
                 new MenuList("qHit", "Q Hitchances", new []{ "Low", "Medium", "High", "VeryHigh", "Dashing", "Immobile" }, 1),
-                new MenuBool("w", "Use Combo W"),
+                new MenuBool("w", "Use Combo W", false),
                 new MenuSliderBool("wAuto", "Use Auto W / if Mana >= x%", false, 60, 0, 99),
                 new MenuSlider("wProtect", "Use W Ally Heal <= x%", 50, 1, 99),
                 new MenuBool("e", "Use Combo E"),
