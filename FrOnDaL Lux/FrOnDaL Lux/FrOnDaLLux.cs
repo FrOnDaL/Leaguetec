@@ -20,6 +20,15 @@ namespace FrOnDaL_Lux
         public static Orbwalker Orbwalker = new Orbwalker();
         public static Obj_AI_Hero Lux => ObjectManager.GetLocalPlayer();
         private static Spell _q, _w, _e, _r;
+        public static readonly List<string> SpecialChampions = new List<string> { "Annie", "Jhin" };
+        public static int SxOffset(Obj_AI_Hero target)
+        {
+            return SpecialChampions.Contains(target.ChampionName) ? 1 : 10;
+        }
+        public static int SyOffset(Obj_AI_Hero target)
+        {
+            return SpecialChampions.Contains(target.ChampionName) ? 3 : 20;
+        }
         public FrOnDaLLux()
         {
             /*Spells*/
@@ -87,12 +96,14 @@ namespace FrOnDaL_Lux
                 new MenuBool("q", "Draw Q"),
                 new MenuBool("w", "Draw W", false),
                 new MenuBool("e", "Draw E"),
-                new MenuBool("r", "Draw R")
+                new MenuBool("r", "Draw R"),
+                new MenuBool("drawDamage", "Draw R")
             };
             Main.Add(drawings);
             Main.Attach();
 
-            Game.OnUpdate += Game_OnUpdate;           
+            Game.OnUpdate += Game_OnUpdate;
+            Render.OnPresent += DamageDraw;
             Render.OnPresent += SpellDraw;
         }
 
@@ -114,7 +125,7 @@ namespace FrOnDaL_Lux
             if (Main["drawings"]["r"].As<MenuBool>().Enabled)
             {
                 Render.Circle(Lux.Position, _r.Range, 180, Color.Green);
-            }
+            }           
         }
 
         private static void Game_OnUpdate()
@@ -273,6 +284,28 @@ namespace FrOnDaL_Lux
                         _e.Cast(jungleTarget);
                     }
                 }
+            }
+        }
+
+        /*Draw Damage Ulti */
+        private static void DamageDraw()
+        {
+            if (Main["drawings"]["drawDamage"].Enabled)
+            {
+                ObjectManager.Get<Obj_AI_Base>().Where(h => h is Obj_AI_Hero && h.IsValidTarget() && h.IsValidTarget(1700)).ToList().ForEach(unit =>
+                        {
+                            var heroUnit = unit as Obj_AI_Hero;
+                            const int width = 103;
+                            var xOffset = SxOffset(heroUnit);
+                            var yOffset = SyOffset(heroUnit);
+                            var barPos = unit.FloatingHealthBarPosition;
+                            barPos.X += xOffset;
+                            barPos.Y += yOffset;
+                            var drawEndXPos = barPos.X + width * (unit.HealthPercent() / 100);
+                            var drawStartXPos = (float)(barPos.X + (unit.Health > Lux.GetSpellDamage(unit, SpellSlot.R) ? width *((unit.Health - Lux.GetSpellDamage(unit, SpellSlot.R)) / unit.MaxHealth * 100 / 100) : 0));
+
+                            Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, unit.Health < Lux.GetSpellDamage(unit, SpellSlot.R) ? Color.GreenYellow : Color.ForestGreen);
+                        });
             }
         }
 
