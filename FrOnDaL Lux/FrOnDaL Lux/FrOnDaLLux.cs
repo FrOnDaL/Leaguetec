@@ -49,7 +49,7 @@ namespace FrOnDaL_Lux
             {
                 new MenuBool("q", "Use Combo Q"),
                 new MenuList("qHit", "Q Hitchances", new []{ "Low", "Medium", "High", "VeryHigh", "Dashing", "Immobile" }, 1),
-                new MenuBool("w", "Use Combo W", false),
+                new MenuSliderBool("w", "Use Combo W", false, 15, 0, 99),
                 new MenuSliderBool("wAuto", "Use Auto W / if Mana >= x%", false, 60, 0, 99),
                 new MenuSlider("wProtect", "Use W Ally Heal <= x%", 50, 1, 99),
                 new MenuBool("e", "Use Combo E"),
@@ -198,7 +198,7 @@ namespace FrOnDaL_Lux
                 
             }
 
-            if (Main["combo"]["w"].As<MenuBool>().Enabled && _w.Ready)
+            if (Main["combo"]["w"].As<MenuSliderBool>().Enabled && Lux.ManaPercent() > Main["combo"]["w"].As<MenuSliderBool>().Value && _w.Ready)
             {
                 foreach (var ally in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsInRange(_w.Range) && x.IsAlly && x.HealthPercent() <= Main["combo"]["wProtect"].Value && x.CountEnemyHeroesInRange(750) >= 1))
                 {
