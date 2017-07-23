@@ -77,6 +77,7 @@ namespace FrOnDaL_Lux
             {
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 30, 0, 99),
                 new MenuSliderBool("e", "Use E / if Mana >= x%", true, 30, 0, 99),
+                new MenuKeyBind("jungSteal", "Baron and Dragon Steal, R Key:", KeyCode.S, KeybindType.Toggle)
             };
             Main.Add(jungleclear);
 
@@ -159,8 +160,17 @@ namespace FrOnDaL_Lux
                         _w.CastOnUnit(ally);
                     }
                 }
-
-
+            }
+            if (Main["jungleclear"]["jungSteal"].As<MenuKeyBind>().Enabled && _r.Ready)
+            {
+                foreach (var jungSteal in ObjectManager.Get<Obj_AI_Minion>().Where(x => x.IsValidTarget(_r.Range) && Lux.GetSpellDamage(x, SpellSlot.R) >= x.Health))
+                {
+                    if (jungSteal.UnitSkinName.StartsWith("SRU_Dragon") || jungSteal.UnitSkinName.StartsWith("SRU_Baron") || jungSteal.UnitSkinName.StartsWith("SRU_RiftHerald"))
+                    {                     
+                            _r.Cast(jungSteal);                                                
+                    }
+                    
+                }
             }
             if (_r.Ready && Main["combo"]["keyR"].As<MenuKeyBind>().Enabled)
             {
