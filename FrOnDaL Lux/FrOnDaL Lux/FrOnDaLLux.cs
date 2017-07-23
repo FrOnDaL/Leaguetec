@@ -27,7 +27,7 @@ namespace FrOnDaL_Lux
         }
         public static int SyOffset(Obj_AI_Hero target)
         {
-            return SpecialChampions.Contains(target.ChampionName) ? 3 : 20;
+            return SpecialChampions.Contains(target.ChampionName) ? 7 : 20;
         }
         public FrOnDaLLux()
         {
@@ -342,17 +342,17 @@ namespace FrOnDaL_Lux
         {
             if (args.InternalName == "qHit")
             {
-                _q.HitChance = (HitChance)args.GetNewValue<MenuList>().Value;
+                _q.HitChance = (HitChance)args.GetNewValue<MenuList>().Value + 3;
             }          
 
             if (args.InternalName == "eHit")
             {
-                _e.HitChance = (HitChance)args.GetNewValue<MenuList>().Value;
+                _e.HitChance = (HitChance)args.GetNewValue<MenuList>().Value + 3;
             }
 
             if (args.InternalName == "rHit")
             {
-                _r.HitChance = (HitChance)args.GetNewValue<MenuList>().Value;
+                _r.HitChance = (HitChance)args.GetNewValue<MenuList>().Value + 3;
             }
         }
     }
