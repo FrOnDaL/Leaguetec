@@ -95,11 +95,11 @@ namespace FrOnDaL_Lux
             /*Drawings Menu*/
             var drawings = new Menu("drawings", "Drawings")
             {
-                new MenuBool("q", "Draw Q"),
+                new MenuBool("q", "Draw Q", false),
                 new MenuBool("w", "Draw W", false),
                 new MenuBool("e", "Draw E"),
                 new MenuBool("r", "Draw R"),
-                new MenuBool("drawDamage", "Draw R")
+                new MenuBool("drawDamage", "Use Draw Ulti(R) Damage")
             };
             Main.Add(drawings);
             Main.Attach();
