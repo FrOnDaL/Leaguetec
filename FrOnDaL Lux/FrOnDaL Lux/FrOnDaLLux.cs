@@ -77,7 +77,7 @@ namespace FrOnDaL_Lux
             {
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 30, 0, 99),
                 new MenuSliderBool("e", "Use E / if Mana >= x%", true, 30, 0, 99),
-                new MenuKeyBind("jungSteal", "Baron and Dragon Steal, R Key:", KeyCode.S, KeybindType.Toggle)
+                new MenuKeyBind("jungSteal", "Baron - Dragon - RiftHerald Steal, R Key:", KeyCode.S, KeybindType.Toggle)
             };
             Main.Add(jungleclear);
 
