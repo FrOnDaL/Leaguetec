@@ -175,7 +175,8 @@ namespace FrOnDaL_Swain
             {
                 var target = TargetSelector.GetTarget(_e.Range);
                 if (target == null) return;
-                _e.Cast(target);
+                _e.CastOnUnit(target);
+
             }
 
             if (Main["combo"]["r"].As<MenuBool>().Enabled && _r.Ready)
@@ -256,7 +257,7 @@ namespace FrOnDaL_Swain
                 {
                     if (!minion.IsValidTarget(_e.Range) || minion == null) continue;
                     
-                        _e.Cast(minion);                   
+                    _e.CastOnUnit(minion);
                 }
             }
 
@@ -318,8 +319,8 @@ namespace FrOnDaL_Swain
                 foreach (var jungleTarget in GetGenericJungleMinionsTargetsInRange(_e.Range))
                 {
                     if (jungleTarget.IsValidTarget(_e.Range) && GetGenericJungleMinionsTargets().Contains(jungleTarget) && jungleTarget.IsValidSpellTarget())
-                    {
-                        _e.Cast(jungleTarget);
+                    {                     
+                        _e.CastOnUnit(jungleTarget);
                     }
                 }
             }
