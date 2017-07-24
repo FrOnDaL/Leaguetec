@@ -82,7 +82,8 @@ namespace FrOnDaL_Swain
                 new MenuBool("autoHarass", "Auto Harass", false),
                 new MenuKeyBind("keyHarass", "Harass Key:", KeyCode.C, KeybindType.Press),
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 70, 0, 99),
-                new MenuSliderBool("w", "Use W / if Mana >= x%", false, 70, 0, 99)
+                new MenuSliderBool("w", "Use W / if Mana >= x%", false, 70, 0, 99),
+                new MenuSliderBool("e", "Use E / if Mana >= x%", true, 70, 0, 99)
             };
             Main.Add(harass);
 
@@ -176,7 +177,6 @@ namespace FrOnDaL_Swain
                 var target = TargetSelector.GetTarget(_e.Range);
                 if (target == null) return;
                 _e.CastOnUnit(target);
-
             }
 
             if (Main["combo"]["r"].As<MenuBool>().Enabled && _r.Ready)
@@ -219,7 +219,12 @@ namespace FrOnDaL_Swain
                     _w.Cast(prediction.CastPosition);
                 }
             }
-
+            if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["harass"]["e"].As<MenuSliderBool>().Value && _e.Ready)
+            {
+                var target = TargetSelector.GetTarget(_e.Range);
+                if (target == null) return;
+                _e.CastOnUnit(target);
+            }
         }
 
         /*LaneClear*/
