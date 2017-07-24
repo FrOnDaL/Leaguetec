@@ -238,9 +238,13 @@ namespace FrOnDaL_Lux
             {
                 var target = TargetSelector.GetTarget(_e.Range);
                 if (target == null) return;
-                if (target.CountEnemyHeroesInRange(_e.Width) >= Main["harass"]["UnitsEhit"].As<MenuSlider>().Value)
+                var prediction = _e.GetPrediction(target);
+                if (target.CountEnemyHeroesInRange(_e.Width) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value && _e.Ready)
                 {
-                    _e.Cast(target);
+                    if (prediction.HitChance >= HitChance.Low)
+                    {
+                        _e.Cast(prediction.CastPosition);
+                    }
                 }
             }
 
