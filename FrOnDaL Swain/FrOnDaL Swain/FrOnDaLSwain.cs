@@ -27,7 +27,7 @@ namespace FrOnDaL_Swain
         }
         public static int SyOffset(Obj_AI_Hero target)
         {
-            return SpecialChampions.Contains(target.ChampionName) ? 7 : 11;
+            return SpecialChampions.Contains(target.ChampionName) ? 7 : 20;
         }
         public FrOnDaLSwain()
         {
