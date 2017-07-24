@@ -27,7 +27,7 @@ namespace FrOnDaL_Lux
         }
         public static int SyOffset(Obj_AI_Hero target)
         {
-            return SpecialChampions.Contains(target.ChampionName) ? 7 : 20;
+            return SpecialChampions.Contains(target.ChampionName) ? 7 : 11;
         }
         public FrOnDaLLux()
         {
@@ -195,7 +195,7 @@ namespace FrOnDaL_Lux
                 var target = TargetSelector.GetTarget(_e.Range);
                 if (target == null) return; 
                 var prediction = _e.GetPrediction(target);
-                if (target.CountEnemyHeroesInRange(_e.Width) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value && _e.Ready)
+                if (target.CountEnemyHeroesInRange(_e.Width) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value)
                 {
                     if (prediction.HitChance >= HitChance.High)
                     {                       
@@ -239,7 +239,7 @@ namespace FrOnDaL_Lux
                 var target = TargetSelector.GetTarget(_e.Range);
                 if (target == null) return;
                 var prediction = _e.GetPrediction(target);
-                if (target.CountEnemyHeroesInRange(_e.Width) >= Main["harass"]["UnitsEhit"].As<MenuSlider>().Value && _e.Ready)
+                if (target.CountEnemyHeroesInRange(_e.Width) >= Main["harass"]["UnitsEhit"].As<MenuSlider>().Value)
                 {
                     if (prediction.HitChance >= HitChance.Low)
                     {
