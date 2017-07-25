@@ -1,4 +1,5 @@
-﻿using Aimtec;
+﻿using System.Collections.Generic;
+using Aimtec;
 using System.Linq;
 using System.Drawing;
 using Aimtec.SDK.Menu;
@@ -17,7 +18,7 @@ namespace FrOnDaL_Thresh
         public static Menu Main = new Menu("Index", "FrOnDaL Thresh", true);
         public static Orbwalker Orbwalker = new Orbwalker();
         public static Obj_AI_Hero Thresh => ObjectManager.GetLocalPlayer();
-        private static Spell _q, _w, _e, _r;
+        private static Spell _q, _w, _e, _r, _flash;
         public FrOnDaLThresh()
         {
             /*Spells*/
@@ -26,8 +27,12 @@ namespace FrOnDaL_Thresh
             _e = new Spell(SpellSlot.E, 500);
             _r = new Spell(SpellSlot.R, 450);
 
-            _q.SetSkillshot(0.4f, 60f, 1400f, true, SkillshotType.Line);
-            _w.SetSkillshot(0.5f, 50f, 2200f, false, SkillshotType.Circle);          
+            _q.SetSkillshot(0.4f, 70f, 1400f, true, SkillshotType.Line);
+            _w.SetSkillshot(0.5f, 100f, 2200f, false, SkillshotType.Circle);
+            if (Thresh.SpellBook.GetSpell(SpellSlot.Summoner1).SpellData.Name == "SummonerFlash")
+                _flash = new Spell(SpellSlot.Summoner1, 425);
+            if (Thresh.SpellBook.GetSpell(SpellSlot.Summoner2).SpellData.Name == "SummonerFlash")
+                _flash = new Spell(SpellSlot.Summoner2, 425);
 
             Orbwalker.Attach(Main);
 
@@ -37,6 +42,8 @@ namespace FrOnDaL_Thresh
                 new MenuBool("q", "Use Combo Q"),
                 new MenuBool("q2Turret", "Use Q2 Under Enemy Turret (On/Off)"),
                 new MenuBool("q2", "Use Combo Q2 (On/Off)"),
+                new MenuKeyBind("flashe", "Q - Flash", KeyCode.T, KeybindType.Press),
+                new MenuSlider("rangee", "-^- Range", 1100, 950, 1250),
                 new MenuBool("w", "Use Combo W"),
                 new MenuBool("wAlly", "AA range in enemy, use Ally W"),
                 //new MenuBool("wJung", "Use W To Ally Jungler"),
@@ -127,6 +134,10 @@ namespace FrOnDaL_Thresh
             {
                 ThreshAutoW();
             }
+            if (Main["combo"]["flashe"].As<MenuKeyBind>().Enabled)
+            {
+                FlashQ();
+            }
         }
         /*Combo*/
         private static void Combo()
@@ -146,7 +157,7 @@ namespace FrOnDaL_Thresh
 
             if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["whiteList"]["qWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && target.IsInRange(_q.Range) && target.IsValidTarget() && !target.HasBuff("threshQ") && _q.Ready)
             {
-                if (prediction.HitChance >= HitChance.High && target.Distance(Thresh.ServerPosition) > 350)
+                if (prediction.HitChance >= HitChance.High && target.Distance(Thresh.ServerPosition) > 400)
                 {
                     _q.Cast(prediction.UnitPosition);                                                   
                 }                
@@ -167,6 +178,60 @@ namespace FrOnDaL_Thresh
             }
         }
 
+        public static List<Obj_AI_Minion> GetAllGenericMinionsTargets()
+        {
+            return GetAllGenericMinionsTargetsInRange(float.MaxValue);
+        }
+
+        public static List<Obj_AI_Minion> GetAllGenericMinionsTargetsInRange(float range)
+        {
+            return GetEnemyLaneMinionsTargetsInRange(range).Concat(GetGenericJungleMinionsTargetsInRange(range)).ToList();
+        }
+        public static List<Obj_AI_Base> GetAllGenericUnitTargets()
+        {
+            return GetAllGenericUnitTargetsInRange(float.MaxValue);
+        }
+
+        public static List<Obj_AI_Base> GetAllGenericUnitTargetsInRange(float range)
+        {
+            return GameObjects.EnemyHeroes.Where(h => h.IsValidTarget(range)).Concat<Obj_AI_Base>(GetAllGenericMinionsTargetsInRange(range)).ToList();
+        }
+
+        private static void FlashQ()
+        {
+            Thresh.IssueOrder(OrderType.MoveTo, Game.CursorPos);
+            var target = GetBestEnemyHeroTargetInRange(Main["combo"]["rangee"].As<MenuSlider>().Value);
+            if (_q.Ready)
+            {
+                if (_flash.Ready && _flash != null && target.IsValidTarget())
+                {
+                    if (target.IsValidTarget(Main["combo"]["rangee"].As<MenuSlider>().Value))
+                    {
+                        if (target.Distance(Thresh) > _q.Range - 100)
+                        {
+                            var meow = _q.GetPrediction(target);
+                            var collisions =
+                                (IList<Obj_AI_Base>)_q.GetPrediction(target).CollisionObjects;
+                            if (collisions.Any())
+                            {
+                                if (collisions.All(c => GetAllGenericUnitTargets().Contains(c)))
+                                {
+                                    return;
+                                }
+                            }
+                            if (_q.Cast(meow.CastPosition))
+                            {
+                                DelayAction.Queue(200, () =>
+                                {
+                                    _flash.Cast(target.ServerPosition);
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private static void ThreshW()
         {
             var ally = GameObjects.AllyHeroes.Where(x => x.IsInRange(_q.Range) && x.IsAlly && !x.IsMe).FirstOrDefault(x => x.Distance(Thresh.Position) <= 1300);
@@ -175,7 +240,7 @@ namespace FrOnDaL_Thresh
             
             if (Main["combo"]["w"].As<MenuBool>().Enabled && ally != null && _w.Ready)
             {
-                //if (ally.Distance(Thresh.ServerPosition) <= 800) return;
+                if (ally.Distance(Thresh.ServerPosition) <= 700) return;
                 if (target.HasBuff("threshQ"))
                 {       
                     _w.Cast(ally.ServerPosition);
@@ -224,6 +289,50 @@ namespace FrOnDaL_Thresh
             {
                 _r.Cast();
             }
+        }
+
+
+        public static List<Obj_AI_Minion> GetGenericJungleMinionsTargets()
+        {
+            return GetGenericJungleMinionsTargetsInRange(float.MaxValue);
+        }
+
+        public static List<Obj_AI_Minion> GetGenericJungleMinionsTargetsInRange(float range)
+        {
+            return GameObjects.Jungle.Where(m => !GameObjects.JungleSmall.Contains(m) && m.IsValidTarget(range)).ToList();
+        }
+        public static List<Obj_AI_Minion> GetEnemyLaneMinionsTargets()
+        {
+            return GetEnemyLaneMinionsTargetsInRange(float.MaxValue);
+        }
+
+        public static List<Obj_AI_Minion> GetEnemyLaneMinionsTargetsInRange(float range)
+        {
+            return GameObjects.EnemyMinions.Where(m => m.IsValidTarget(range)).ToList();
+        }
+
+        public static Obj_AI_Hero GetBestEnemyHeroTarget()
+        {
+            return GetBestEnemyHeroTargetInRange(float.MaxValue);
+        }
+
+        public static Obj_AI_Hero GetBestEnemyHeroTargetInRange(float range)
+        {
+            var ts = TargetSelector.Implementation;
+            var target = ts.GetTarget(range);
+            if (target != null && target.IsValidTarget() && !Invulnerable.Check(target))
+            {
+                return target;
+            }
+
+            var firstTarget = ts.GetOrderedTargets(range)
+                .FirstOrDefault(t => t.IsValidTarget() && !Invulnerable.Check(t));
+            if (firstTarget != null)
+            {
+                return firstTarget;
+            }
+
+            return null;
         }
     }
 }
