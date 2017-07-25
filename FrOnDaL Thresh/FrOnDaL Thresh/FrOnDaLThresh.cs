@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Aimtec;
+﻿using Aimtec;
 using System.Linq;
 using System.Drawing;
 using Aimtec.SDK.Menu;
@@ -8,6 +7,7 @@ using Aimtec.SDK.Orbwalking;
 using Aimtec.SDK.Extensions;
 using Spell = Aimtec.SDK.Spell;
 using Aimtec.SDK.TargetSelector;
+using System.Collections.Generic;
 using Aimtec.SDK.Menu.Components;
 using Aimtec.SDK.Prediction.Skillshots;
 
@@ -28,7 +28,7 @@ namespace FrOnDaL_Thresh
             _r = new Spell(SpellSlot.R, 450);
 
             _q.SetSkillshot(0.4f, 70f, 1400f, true, SkillshotType.Line);
-            _w.SetSkillshot(0.5f, 100f, 2200f, false, SkillshotType.Circle);
+            _w.SetSkillshot(0.5f, 50f, 2200f, false, SkillshotType.Circle);
             if (Thresh.SpellBook.GetSpell(SpellSlot.Summoner1).SpellData.Name == "SummonerFlash")
                 _flash = new Spell(SpellSlot.Summoner1, 425);
             if (Thresh.SpellBook.GetSpell(SpellSlot.Summoner2).SpellData.Name == "SummonerFlash")
@@ -43,7 +43,7 @@ namespace FrOnDaL_Thresh
                 new MenuBool("q2Turret", "Use Q2 Under Enemy Turret (On/Off)"),
                 new MenuBool("q2", "Use Combo Q2 (On/Off)"),
                 new MenuKeyBind("flashe", "Q - Flash", KeyCode.T, KeybindType.Press),
-                new MenuSlider("rangee", "-^- Range", 1100, 950, 1250),
+                new MenuSlider("rangee", "-^- Range", 1250, 1050, 1450),
                 new MenuBool("w", "Use Combo W"),
                 new MenuBool("wAlly", "AA range in enemy, use Ally W"),
                 //new MenuBool("wJung", "Use W To Ally Jungler"),

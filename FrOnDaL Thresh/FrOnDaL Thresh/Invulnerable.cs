@@ -1,9 +1,9 @@
 ﻿using System;
+using Aimtec;
+using System.Linq;
+using Aimtec.SDK.Extensions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Aimtec;
-using Aimtec.SDK.Extensions;
 
 namespace FrOnDaL_Thresh
 {
