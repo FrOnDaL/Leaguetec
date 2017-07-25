@@ -7,7 +7,6 @@ using Aimtec.SDK.Orbwalking;
 using Aimtec.SDK.Extensions;
 using Spell = Aimtec.SDK.Spell;
 using Aimtec.SDK.TargetSelector;
-using System.Collections.Generic;
 using Aimtec.SDK.Menu.Components;
 using Aimtec.SDK.Prediction.Skillshots;
 
@@ -18,7 +17,7 @@ namespace FrOnDaL_Thresh
         public static Menu Main = new Menu("Index", "FrOnDaL Thresh", true);
         public static Orbwalker Orbwalker = new Orbwalker();
         public static Obj_AI_Hero Thresh => ObjectManager.GetLocalPlayer();
-        private static Spell _q, _w, _e, _r, _flash;
+        private static Spell _q, _w, _e, _r;
         public FrOnDaLThresh()
         {
             /*Spells*/
@@ -26,13 +25,8 @@ namespace FrOnDaL_Thresh
             _w = new Spell(SpellSlot.W, 950);
             _e = new Spell(SpellSlot.E, 500);
             _r = new Spell(SpellSlot.R, 450);
-
             _q.SetSkillshot(0.4f, 70f, 1400f, true, SkillshotType.Line);
-            _w.SetSkillshot(0.5f, 50f, 2200f, false, SkillshotType.Circle);
-            if (Thresh.SpellBook.GetSpell(SpellSlot.Summoner1).SpellData.Name == "SummonerFlash")
-                _flash = new Spell(SpellSlot.Summoner1, 425);
-            if (Thresh.SpellBook.GetSpell(SpellSlot.Summoner2).SpellData.Name == "SummonerFlash")
-                _flash = new Spell(SpellSlot.Summoner2, 425);
+            _w.SetSkillshot(0.5f, 50f, 2200f, false, SkillshotType.Circle);    
 
             Orbwalker.Attach(Main);
 
@@ -42,8 +36,6 @@ namespace FrOnDaL_Thresh
                 new MenuBool("q", "Use Combo Q"),
                 new MenuBool("q2Turret", "Use Q2 Under Enemy Turret (On/Off)"),
                 new MenuBool("q2", "Use Combo Q2 (On/Off)"),
-                new MenuKeyBind("flashe", "Q - Flash", KeyCode.T, KeybindType.Press),
-                new MenuSlider("rangee", "-^- Range", 1250, 1050, 1450),
                 new MenuBool("w", "Use Combo W"),
                 new MenuBool("wAlly", "AA range in enemy, use Ally W"),
                 //new MenuBool("wJung", "Use W To Ally Jungler"),
@@ -134,10 +126,6 @@ namespace FrOnDaL_Thresh
             {
                 ThreshAutoW();
             }
-            if (Main["combo"]["flashe"].As<MenuKeyBind>().Enabled)
-            {
-                FlashQ();
-            }
         }
         /*Combo*/
         private static void Combo()
@@ -174,60 +162,6 @@ namespace FrOnDaL_Thresh
                 if (target.Distance(Thresh.ServerPosition) >= 400)
                 {
                     DelayAction.Queue(1000, () => _q.CastOnUnit(Thresh));
-                }
-            }
-        }
-
-        public static List<Obj_AI_Minion> GetAllGenericMinionsTargets()
-        {
-            return GetAllGenericMinionsTargetsInRange(float.MaxValue);
-        }
-
-        public static List<Obj_AI_Minion> GetAllGenericMinionsTargetsInRange(float range)
-        {
-            return GetEnemyLaneMinionsTargetsInRange(range).Concat(GetGenericJungleMinionsTargetsInRange(range)).ToList();
-        }
-        public static List<Obj_AI_Base> GetAllGenericUnitTargets()
-        {
-            return GetAllGenericUnitTargetsInRange(float.MaxValue);
-        }
-
-        public static List<Obj_AI_Base> GetAllGenericUnitTargetsInRange(float range)
-        {
-            return GameObjects.EnemyHeroes.Where(h => h.IsValidTarget(range)).Concat<Obj_AI_Base>(GetAllGenericMinionsTargetsInRange(range)).ToList();
-        }
-
-        private static void FlashQ()
-        {
-            Thresh.IssueOrder(OrderType.MoveTo, Game.CursorPos);
-            var target = GetBestEnemyHeroTargetInRange(Main["combo"]["rangee"].As<MenuSlider>().Value);
-            if (_q.Ready)
-            {
-                if (_flash.Ready && _flash != null && target.IsValidTarget())
-                {
-                    if (target.IsValidTarget(Main["combo"]["rangee"].As<MenuSlider>().Value))
-                    {
-                        if (target.Distance(Thresh) > _q.Range - 100)
-                        {
-                            var meow = _q.GetPrediction(target);
-                            var collisions =
-                                (IList<Obj_AI_Base>)_q.GetPrediction(target).CollisionObjects;
-                            if (collisions.Any())
-                            {
-                                if (collisions.All(c => GetAllGenericUnitTargets().Contains(c)))
-                                {
-                                    return;
-                                }
-                            }
-                            if (_q.Cast(meow.CastPosition))
-                            {
-                                DelayAction.Queue(200, () =>
-                                {
-                                    _flash.Cast(target.ServerPosition);
-                                });
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -278,8 +212,7 @@ namespace FrOnDaL_Thresh
                 else
                 {
                     _e.Cast(target.Position.Extend(Thresh.ServerPosition, Vector3.Distance(target.Position, Thresh.Position) + 400));
-                }
-                
+                }            
             }
         }
 
@@ -289,50 +222,6 @@ namespace FrOnDaL_Thresh
             {
                 _r.Cast();
             }
-        }
-
-
-        public static List<Obj_AI_Minion> GetGenericJungleMinionsTargets()
-        {
-            return GetGenericJungleMinionsTargetsInRange(float.MaxValue);
-        }
-
-        public static List<Obj_AI_Minion> GetGenericJungleMinionsTargetsInRange(float range)
-        {
-            return GameObjects.Jungle.Where(m => !GameObjects.JungleSmall.Contains(m) && m.IsValidTarget(range)).ToList();
-        }
-        public static List<Obj_AI_Minion> GetEnemyLaneMinionsTargets()
-        {
-            return GetEnemyLaneMinionsTargetsInRange(float.MaxValue);
-        }
-
-        public static List<Obj_AI_Minion> GetEnemyLaneMinionsTargetsInRange(float range)
-        {
-            return GameObjects.EnemyMinions.Where(m => m.IsValidTarget(range)).ToList();
-        }
-
-        public static Obj_AI_Hero GetBestEnemyHeroTarget()
-        {
-            return GetBestEnemyHeroTargetInRange(float.MaxValue);
-        }
-
-        public static Obj_AI_Hero GetBestEnemyHeroTargetInRange(float range)
-        {
-            var ts = TargetSelector.Implementation;
-            var target = ts.GetTarget(range);
-            if (target != null && target.IsValidTarget() && !Invulnerable.Check(target))
-            {
-                return target;
-            }
-
-            var firstTarget = ts.GetOrderedTargets(range)
-                .FirstOrDefault(t => t.IsValidTarget() && !Invulnerable.Check(t));
-            if (firstTarget != null)
-            {
-                return firstTarget;
-            }
-
-            return null;
         }
     }
 }
