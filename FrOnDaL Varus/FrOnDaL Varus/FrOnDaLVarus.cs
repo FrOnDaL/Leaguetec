@@ -278,7 +278,7 @@ namespace FrOnDaL_Varus
         /*Lane Clear*/
         private static void LaneClear()
         {         
-            if (Main["laneclear"]["q"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["laneclear"]["q"].As<MenuSliderBool>().Value && _q.Ready && (Varus.CountEnemyHeroesInRange(600) == 0 || _q.IsCharging))
+            if (Main["laneclear"]["q"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["laneclear"]["q"].As<MenuSliderBool>().Value && _q.Ready)
             {
                 foreach (var target in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.ChargedMaxRange)))
                 {
@@ -290,11 +290,11 @@ namespace FrOnDaL_Varus
                     if (!_q.IsCharging) return;
                     if (Varus.Distance(target) > 600 && _q.ChargePercent >= 90)
                     {
-                        _q.Cast(_q.GetPrediction(target).CastPosition);
+                        _q.Cast(target.Position);
                     }
                     else if (Varus.Distance(target) < 600 && _q.ChargePercent >= 40)
                     {
-                        _q.Cast(_q.GetPrediction(target).CastPosition);
+                        _q.Cast(target.Position);
                     }
                 }
             }
