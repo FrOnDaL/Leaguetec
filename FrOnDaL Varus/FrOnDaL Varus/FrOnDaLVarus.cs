@@ -50,7 +50,7 @@ namespace FrOnDaL_Varus
             _q.SetSkillshot(0.25f, 70, 1900, false, SkillshotType.Line);
             _q.SetCharged("VarusQ", "VarusQ", 1000, 1600, 1.3f);           
             _e.SetSkillshot(250, 235, 1500f, false, SkillshotType.Circle);
-            _r.SetSkillshot(250, 120, 1950f, false, SkillshotType.Line);
+            _r.SetSkillshot(250, 120, 1300f, false, SkillshotType.Line);
 
             Orbwalker.Attach(Main);
 
@@ -232,7 +232,7 @@ namespace FrOnDaL_Varus
                         if (enemy == null) continue;
                         if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_e.Width, false, false, _e.GetPrediction(enemy).CastPosition)) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value)
                         {
-                            _e.Cast(_e.GetPrediction(target).CastPosition);
+                            _e.Cast(target.Position);
                         }
                     }
                 //}
@@ -350,7 +350,7 @@ namespace FrOnDaL_Varus
             if (Main["combo"]["whiteListR"]["rWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && _r.Ready &&
                 target.IsInRange(_r.Range - 100) && target.IsValidTarget(_r.Range - 100) && rHit.Count >= Main["combo"]["rHit"].As<MenuSlider>().Value)
             {              
-                    _r.Cast(_r.GetPrediction(target).CastPosition);             
+                    _r.Cast(target.Position);             
             }
         }
 
