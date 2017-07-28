@@ -278,7 +278,7 @@ namespace FrOnDaL_Varus
         /*Lane Clear*/
         private static void LaneClear()
         {         
-            if (Main["laneclear"]["q"].As<MenuSliderBool>().Enabled && _q.Ready)
+            if (Main["laneclear"]["q"].As<MenuSliderBool>().Enabled && _q.Ready && !Main["harass"]["autoHarass"].As<MenuBool>().Enabled)
             {
                 foreach (var targetL in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.ChargedMaxRange)))
                 {
@@ -299,7 +299,7 @@ namespace FrOnDaL_Varus
                 }
             }
 
-            if (Main["laneclear"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["laneclear"]["e"].As<MenuSliderBool>().Value && _e.Ready && Varus.CountEnemyHeroesInRange(_e.Range) == 0)
+            if (Main["laneclear"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["laneclear"]["e"].As<MenuSliderBool>().Value && _e.Ready && !Main["harass"]["autoHarass"].As<MenuBool>().Enabled)
             {
                 foreach (var targetE in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_e.Range)))
                 {
