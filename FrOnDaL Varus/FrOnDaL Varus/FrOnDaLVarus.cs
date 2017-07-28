@@ -45,12 +45,12 @@ namespace FrOnDaL_Varus
             /*Spells*/
             _q = new Spell(SpellSlot.Q, 1000);
             _e = new Spell(SpellSlot.E, 925);
-            _r = new Spell(SpellSlot.R, 1200);
+            _r = new Spell(SpellSlot.R, 1200f);
 
             _q.SetSkillshot(0.25f, 70, 1900, false, SkillshotType.Line);
             _q.SetCharged("VarusQ", "VarusQ", 1000, 1600, 1.3f);           
             _e.SetSkillshot(250, 235, 1500f, false, SkillshotType.Circle);
-            _r.SetSkillshot(250, 120, 1300f, false, SkillshotType.Line);
+            _r.SetSkillshot(250f, 120f, 1950f, false, SkillshotType.Line);
 
             Orbwalker.Attach(Main);
 
@@ -71,7 +71,7 @@ namespace FrOnDaL_Varus
                 combo.Add(new MenuSlider("UnitsEhit", "E Hit x Units Enemy", 1, 1, 3));
                 //combo.Add(new MenuSliderBool("eStcW", "Minimum W stack for E", false, 2, 1, 3));
                 combo.Add(new MenuKeyBind("keyR", "R Key:", KeyCode.T, KeybindType.Press));
-                combo.Add(new MenuSlider("rHit", "Minimum enemies for R", 2, 1, 5));
+                combo.Add(new MenuSlider("rHit", "Minimum enemies for R", 1, 1, 5));
                 var whiteListR = new Menu("whiteListR", "R White List");
                 {
                     foreach (var enemies in GameObjects.EnemyHeroes)
@@ -187,42 +187,42 @@ namespace FrOnDaL_Varus
         private static void Combo()
         {
 
-            var target = TargetSelector.GetTarget(_q.ChargedMaxRange);
-            if (target == null) return;
+            var targetC = TargetSelector.GetTarget(_q.ChargedMaxRange);
+            if (targetC == null) return;
 
-            if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["combo"]["whiteListQ"]["qWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && _q.Ready)
+            if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["combo"]["whiteListQ"]["qWhiteList" + targetC.ChampionName.ToLower()].As<MenuBool>().Enabled && _q.Ready)
             {
                 /*if (Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled && BuffW(target) && GoBuffW(target).Count >= Main["combo"]["qstcW"].As<MenuSliderBool>().Value || !Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled)
                 {*/                                               
                 if (!_q.IsCharging && !IsPreAa)
                 {
-                    _q.StartCharging(_q.GetPrediction(target).CastPosition); return;
+                    _q.StartCharging(_q.GetPrediction(targetC).CastPosition); return;
                 }
                 if (!_q.IsCharging) return;              
                     if (Varus.CountEnemyHeroesInRange(700) == 0 && _q.ChargePercent >= 100)
                     {
-                        var prediction = _q.GetPrediction(target);
+                        var prediction = _q.GetPrediction(targetC);
 
                         if (prediction.HitChance >= HitChance.Medium)
                         {
-                            _q.Cast(_q.GetPrediction(target).CastPosition);
+                            _q.Cast(_q.GetPrediction(targetC).CastPosition);
                         }
                            
                     }
                     else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 20)
                     {
-                        var prediction = _q.GetPrediction(target);
+                        var prediction = _q.GetPrediction(targetC);
 
                         if (prediction.HitChance >= HitChance.Medium)
                         {
-                            _q.Cast(_q.GetPrediction(target).CastPosition);
+                            _q.Cast(_q.GetPrediction(targetC).CastPosition);
                         }
 
                     }
                //}
         }
 
-            if (Main["combo"]["e"].As<MenuBool>().Enabled && target.IsValidTarget(_e.Range) && _e.Ready)
+            if (Main["combo"]["e"].As<MenuBool>().Enabled && targetC.IsValidTarget(_e.Range) && _e.Ready)
             {
                /* if (Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled && BuffW(target) && GoBuffW(target).Count >=
                     Main["combo"]["eStcW"].As<MenuSliderBool>().Value || !Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled)
@@ -232,7 +232,7 @@ namespace FrOnDaL_Varus
                         if (enemy == null) continue;
                         if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_e.Width, false, false, _e.GetPrediction(enemy).CastPosition)) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value)
                         {
-                            _e.Cast(target.Position);
+                            _e.Cast(targetC.Position);
                         }
                     }
                 //}
@@ -243,26 +243,26 @@ namespace FrOnDaL_Varus
         /*Harass*/
         private static void Harass()
         {
-            var target = TargetSelector.GetTarget(_q.ChargedMaxRange - 100);
-            if (target == null) return;
-            if (Main["harass"]["q"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["harass"]["q"].As<MenuSliderBool>().Value && Main["harass"]["whiteListQ"]["qWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && _q.Ready && !Varus.IsUnderEnemyTurret())
+            var targetH = TargetSelector.GetTarget(_q.ChargedMaxRange - 100);
+            if (targetH == null) return;
+            if (Main["harass"]["q"].As<MenuSliderBool>().Enabled && Main["harass"]["whiteListQ"]["qWhiteList" + targetH.ChampionName.ToLower()].As<MenuBool>().Enabled && _q.Ready && !Varus.IsUnderEnemyTurret())
             {
-                if (!_q.IsCharging && !IsPreAa)
+                if (!_q.IsCharging && !IsPreAa && Varus.ManaPercent() > Main["harass"]["q"].As<MenuSliderBool>().Value)
                 {
-                    _q.StartCharging(_q.GetPrediction(target).CastPosition); return;
+                    _q.StartCharging(_q.GetPrediction(targetH).CastPosition); return;
                 }
                 if (!_q.IsCharging) return;
                 if (Varus.CountEnemyHeroesInRange(700) == 0 && _q.ChargePercent >= 100)
                 {
-                    _q.Cast(_q.GetPrediction(target).CastPosition);
+                    _q.Cast(_q.GetPrediction(targetH).CastPosition);
                 }
                 else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 20)
                 {
-                    _q.Cast(_q.GetPrediction(target).CastPosition);
+                    _q.Cast(_q.GetPrediction(targetH).CastPosition);
                 }
             }
 
-            if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["harass"]["e"].As<MenuSliderBool>().Value && !Varus.IsUnderEnemyTurret() && target.IsValidTarget(_e.Range) && _e.Ready)
+            if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["harass"]["e"].As<MenuSliderBool>().Value && !Varus.IsUnderEnemyTurret() && targetH.IsValidTarget(_e.Range) && _e.Ready)
             {
                 foreach (var enemy in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(_e.Range)))
                 {
@@ -278,35 +278,35 @@ namespace FrOnDaL_Varus
         /*Lane Clear*/
         private static void LaneClear()
         {         
-            if (Main["laneclear"]["q"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["laneclear"]["q"].As<MenuSliderBool>().Value && _q.Ready)
+            if (Main["laneclear"]["q"].As<MenuSliderBool>().Enabled && _q.Ready)
             {
-                foreach (var target in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.ChargedMaxRange)))
+                foreach (var targetL in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.ChargedMaxRange)))
                 {
-                    if (target == null) return;              
-                    if (GameObjects.EnemyMinions.Count(t => t.IsValidTarget(150, false, false, _q.GetPrediction(target).CastPosition)) >= Main["laneclear"]["UnitsQhit"].As<MenuSlider>().Value && !Varus.IsUnderEnemyTurret() && !_q.IsCharging && !IsPreAa)
+                    if (targetL == null) return;              
+                    if (Varus.ManaPercent() >= Main["laneclear"]["q"].As<MenuSliderBool>().Value && GameObjects.EnemyMinions.Count(t => t.IsValidTarget(150, false, false, _q.GetPrediction(targetL).CastPosition)) >= Main["laneclear"]["UnitsQhit"].As<MenuSlider>().Value && !Varus.IsUnderEnemyTurret() && !_q.IsCharging && !IsPreAa)
                     {
-                        _q.StartCharging(_q.GetPrediction(target).CastPosition); return;
+                        _q.StartCharging(_q.GetPrediction(targetL).CastPosition); return;
                     }
                     if (!_q.IsCharging) return;
-                    if (Varus.Distance(target) > 700 && _q.ChargePercent >= 90)
+                    if (Varus.Distance(targetL) > 700 && _q.ChargePercent >= 90)
                     {
-                        _q.Cast(target.Position);
+                        _q.Cast(targetL.Position);
                     }
-                    else if (Varus.Distance(target) < 700 && _q.ChargePercent >= 30)
+                    else if (Varus.Distance(targetL) < 700 && _q.ChargePercent >= 30)
                     {
-                        _q.Cast(target.Position);
+                        _q.Cast(targetL.Position);
                     }
                 }
             }
 
             if (Main["laneclear"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["laneclear"]["e"].As<MenuSliderBool>().Value && _e.Ready && Varus.CountEnemyHeroesInRange(_e.Range) == 0)
             {
-                foreach (var target in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_e.Range)))
+                foreach (var targetE in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_e.Range)))
                 {
-                    if (target == null) continue;
-                    if (GameObjects.EnemyMinions.Count(t => t.IsValidTarget(_e.Width, false, false, _e.GetPrediction(target).CastPosition)) >= Main["laneclear"]["UnitsEhit"].As<MenuSlider>().Value && !Varus.IsUnderEnemyTurret())
+                    if (targetE == null) continue;
+                    if (GameObjects.EnemyMinions.Count(t => t.IsValidTarget(_e.Width, false, false, _e.GetPrediction(targetE).CastPosition)) >= Main["laneclear"]["UnitsEhit"].As<MenuSlider>().Value && !Varus.IsUnderEnemyTurret())
                     {
-                        _e.Cast(_e.GetPrediction(target).CastPosition);
+                        _e.Cast(_e.GetPrediction(targetE).CastPosition);
                     }
                 }
             }
@@ -315,42 +315,42 @@ namespace FrOnDaL_Varus
         /*Jungle Clear*/
         private static void JungleClear()
         {
-            foreach (var target in GameObjects.Jungle.Where(x => !GameObjects.JungleSmall.Contains(x) && (GameObjects.JungleLarge.Contains(x) || GameObjects.JungleLegendary.Contains(x)) && x.IsValidTarget(_q.ChargedMaxRange)))
+            foreach (var targetJ in GameObjects.Jungle.Where(x => !GameObjects.JungleSmall.Contains(x) && (GameObjects.JungleLarge.Contains(x) || GameObjects.JungleLegendary.Contains(x)) && x.IsValidTarget(_q.ChargedMaxRange)))
             {
-                if (Main["jungleclear"]["q"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["jungleclear"]["q"].As<MenuSliderBool>().Value && target.IsValidTarget(1000) && _q.Ready)
+                if (Main["jungleclear"]["q"].As<MenuSliderBool>().Enabled && targetJ.IsValidTarget(1000) && _q.Ready)
                 {
                                                             
-                    if (!_q.IsCharging)
+                    if (!_q.IsCharging && Varus.ManaPercent() >= Main["jungleclear"]["q"].As<MenuSliderBool>().Value)
                     {
                         if (!IsPreAa)
-                            _q.StartCharging(target.Position);
+                            _q.StartCharging(_q.GetPrediction(targetJ).CastPosition);
                     }
                     else if (_q.IsCharging && _q.ChargePercent >= 100)
                     {
-                        _q.Cast(target.Position);
+                        _q.Cast(targetJ.Position);
                     }  
-                    else if (Varus.Distance(target) < 700 && _q.ChargePercent >= 30)
+                    else if (Varus.Distance(targetJ) < 700 && _q.ChargePercent >= 30)
                     {
-                        _q.Cast(target.Position);
+                        _q.Cast(targetJ.Position);
                     }               
                 }               
 
-                if (Main["jungleclear"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["jungleclear"]["e"].As<MenuSliderBool>().Value && target.IsValidTarget(_e.Range) && _e.Ready)
+                if (Main["jungleclear"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["jungleclear"]["e"].As<MenuSliderBool>().Value && targetJ.IsValidTarget(_e.Range) && _e.Ready)
                 {
-                    _e.Cast(target.Position);
+                    _e.Cast(targetJ.Position);
                 }
             }          
         }
 
         private static void ManualR()
         {
-            var target = TargetSelector.GetTarget(_r.Range - 100);
-            if (target == null) return;
-            var rHit = GameObjects.EnemyHeroes.Where(x => x.Distance(target) <= 450f).ToList();
-            if (Main["combo"]["whiteListR"]["rWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && _r.Ready &&
-                target.IsInRange(_r.Range - 100) && target.IsValidTarget(_r.Range - 100) && rHit.Count >= Main["combo"]["rHit"].As<MenuSlider>().Value)
+            var targetR = TargetSelector.GetTarget(_r.Range - 100);
+            if (targetR == null) return;
+            var rHit = GameObjects.EnemyHeroes.Where(x => x.Distance(targetR) <= 450f).ToList();
+            if (Main["combo"]["whiteListR"]["rWhiteList" + targetR.ChampionName.ToLower()].As<MenuBool>().Enabled && _r.Ready &&
+                targetR.IsInRange(_r.Range - 100) && targetR.IsValidTarget(_r.Range - 100) && rHit.Count >= Main["combo"]["rHit"].As<MenuSlider>().Value)
             {              
-                    _r.Cast(target.Position);             
+                    _r.Cast(targetR.Position);                                         
             }
         }
 
