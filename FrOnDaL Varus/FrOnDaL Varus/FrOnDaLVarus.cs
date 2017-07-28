@@ -209,7 +209,7 @@ namespace FrOnDaL_Varus
                         }
                            
                     }
-                    else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 30)
+                    else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 20)
                     {
                         var prediction = _q.GetPrediction(target);
 
@@ -256,7 +256,7 @@ namespace FrOnDaL_Varus
                 {
                     _q.Cast(_q.GetPrediction(target).CastPosition);
                 }
-                else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 30)
+                else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 20)
                 {
                     _q.Cast(_q.GetPrediction(target).CastPosition);
                 }
@@ -292,7 +292,7 @@ namespace FrOnDaL_Varus
                     {
                         _q.Cast(target.Position);
                     }
-                    else if (Varus.Distance(target) < 700 && _q.ChargePercent >= 40)
+                    else if (Varus.Distance(target) < 700 && _q.ChargePercent >= 30)
                     {
                         _q.Cast(target.Position);
                     }
@@ -329,7 +329,7 @@ namespace FrOnDaL_Varus
                     {
                         _q.Cast(target.Position);
                     }  
-                    else if (Varus.Distance(target) < 700 && _q.ChargePercent >= 40)
+                    else if (Varus.Distance(target) < 700 && _q.ChargePercent >= 30)
                     {
                         _q.Cast(target.Position);
                     }               
