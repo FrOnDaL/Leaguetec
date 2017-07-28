@@ -172,7 +172,7 @@ namespace FrOnDaL_Varus
                     break;
             }
 
-            if (Main["harass"]["autoHarass"].As<MenuBool>().Enabled)
+            if (Main["harass"]["autoHarass"].As<MenuBool>().Enabled /*&& Orbwalker.Mode != OrbwalkingMode.Laneclear && Orbwalker.Mode != OrbwalkingMode.Combo*/)
             {
                 Harass();
             }
@@ -277,8 +277,7 @@ namespace FrOnDaL_Varus
     
         /*Lane Clear*/
         private static void LaneClear()
-        {
-            if (Main["harass"]["autoHarass"].As<MenuBool>().Enabled && Varus.CountAllyHeroesInRange(_q.ChargedMaxRange) >= 1) return;    
+        {            
             if (Main["laneclear"]["q"].As<MenuSliderBool>().Enabled && _q.Ready)
             {
                 foreach (var targetL in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.ChargedMaxRange)))
