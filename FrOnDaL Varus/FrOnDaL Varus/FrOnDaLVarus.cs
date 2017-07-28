@@ -344,7 +344,7 @@ namespace FrOnDaL_Varus
 
         private static void ManualR()
         {
-            var target = TargetSelector.GetTarget(_r.Range);
+            var target = TargetSelector.GetTarget(_r.Range - 100);
             if (target == null) return;
             var rHit = GameObjects.EnemyHeroes.Where(x => x.Distance(target) <= 450f).ToList();
             if (Main["combo"]["whiteListR"]["rWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && _r.Ready &&
