@@ -48,7 +48,7 @@ namespace FrOnDaL_Varus
             _r = new Spell(SpellSlot.R, 1200);
 
             _q.SetSkillshot(0.25f, 70, 1900, false, SkillshotType.Line);
-            _q.SetCharged("VarusQLaunch", "VarusQLaunch", 1000, 1600, 1.3f);           
+            _q.SetCharged("VarusQ", "VarusQ", 1000, 1600, 1.3f);           
             _e.SetSkillshot(250, 235, 1500f, false, SkillshotType.Circle);
             _r.SetSkillshot(250, 120, 1950f, false, SkillshotType.Line);
 
