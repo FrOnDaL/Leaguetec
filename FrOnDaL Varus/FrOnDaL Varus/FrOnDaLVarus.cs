@@ -230,7 +230,7 @@ namespace FrOnDaL_Varus
                     foreach (var enemy in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(_e.Range)))
                     {
                         if (enemy == null) continue;
-                        if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_e.Width, false, false, _e.GetPrediction(enemy).CastPosition)) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value)
+                        if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_e.Width, false, true, _e.GetPrediction(enemy).CastPosition)) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value)
                         {
                             _e.Cast(targetC.Position);
                         }
