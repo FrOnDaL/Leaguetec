@@ -105,7 +105,7 @@ namespace FrOnDaL_Varus
             var laneclear = new Menu("laneclear", "Lane Clear")
             {
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 60, 0, 99),
-                new MenuSlider("UnitsQhit", "Q Hit x Units minions >= x%", 2, 1, 3),
+                new MenuSlider("UnitsQhit", "Q Hit x Units minions >= x%", 3, 1, 3),
                 new MenuSliderBool("e", "Use E / if Mana >= x%", false, 60, 0, 99),
                 new MenuSlider("UnitsEhit", "E Hit x Units minions >= x%", 3, 1, 4)
             };
@@ -172,7 +172,7 @@ namespace FrOnDaL_Varus
                     break;
             }
 
-            if (Main["harass"]["autoHarass"].As<MenuBool>().Enabled /*&& Orbwalker.Mode != OrbwalkingMode.Laneclear && Orbwalker.Mode != OrbwalkingMode.Combo*/)
+            if (Main["harass"]["autoHarass"].As<MenuBool>().Enabled && Orbwalker.Mode != OrbwalkingMode.Laneclear && Orbwalker.Mode != OrbwalkingMode.Combo)
             {
                 Harass();
             }
@@ -187,7 +187,7 @@ namespace FrOnDaL_Varus
         private static void Combo()
         {
 
-            var targetC = TargetSelector.GetTarget(_q.ChargedMaxRange);
+            var targetC = TargetSelector.GetTarget(_q.ChargedMaxRange - 100);
             if (targetC == null) return;
 
             if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["combo"]["whiteListQ"]["qWhiteList" + targetC.ChampionName.ToLower()].As<MenuBool>().Enabled && _q.Ready)
@@ -283,18 +283,19 @@ namespace FrOnDaL_Varus
                 foreach (var targetL in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.ChargedMaxRange)))
                 {
                     if (targetL == null) return;              
-                    if (Varus.ManaPercent() >= Main["laneclear"]["q"].As<MenuSliderBool>().Value && GameObjects.EnemyMinions.Count(t => t.IsValidTarget(150, false, false, _q.GetPrediction(targetL).CastPosition)) >= Main["laneclear"]["UnitsQhit"].As<MenuSlider>().Value && !Varus.IsUnderEnemyTurret() && !_q.IsCharging && !IsPreAa)
+                    if (Varus.ManaPercent() >= Main["laneclear"]["q"].As<MenuSliderBool>().Value && GameObjects.EnemyMinions.Count(t => t.IsValidTarget(150, false, true, _q.GetPrediction(targetL).CastPosition)) >= Main["laneclear"]["UnitsQhit"].As<MenuSlider>().Value && !Varus.IsUnderEnemyTurret() && !_q.IsCharging && !IsPreAa)
                     {
                         _q.StartCharging(_q.GetPrediction(targetL).CastPosition); return;
                     }
                     if (!_q.IsCharging) return;
                     if (Varus.Distance(targetL) > 700 && _q.ChargePercent >= 90)
                     {
-                        _q.Cast(targetL.Position);
+                        _q.Cast(_q.GetPrediction(targetL).CastPosition);
                     }
                     else if (Varus.Distance(targetL) < 700 && _q.ChargePercent >= 30)
                     {
-                        _q.Cast(targetL.Position);
+                        _q.Cast(_q.GetPrediction(targetL).CastPosition);
+                        
                     }
                 }
             }
