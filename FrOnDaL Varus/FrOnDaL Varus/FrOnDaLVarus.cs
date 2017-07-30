@@ -21,13 +21,11 @@ namespace FrOnDaL_Varus
         public static Obj_AI_Hero Varus => ObjectManager.GetLocalPlayer();
         private static Spell _q, _e, _r;
         internal static bool IsPreAa;
-        internal static bool IsAfterAa;
-       /* public static bool BuffW(Obj_AI_Base unit) => unit.Buffs.Any(x => x.Name.Equals("VarusW", StringComparison.CurrentCultureIgnoreCase));
-        public static Buff GoBuffW(Obj_AI_Base unit) => BuffW(unit) ? unit.Buffs.First(x => x.Name.Equals("VarusW", StringComparison.CurrentCultureIgnoreCase)) : null;
-        public static int GetBuffCount(Obj_AI_Hero target) => target.GetBuffCount("VarusW");*/
+        internal static bool IsAfterAa;    
         public static double QDamage(Obj_AI_Base d)
         {
-            var damageQ = Varus.CalculateDamage(d, DamageType.Physical, (float)new double[] { 12, 58, 104, 150, 196 }[Varus.SpellBook.GetSpell(SpellSlot.Q).Level - 1] + Varus.TotalAttackDamage / 100 * 132); return damageQ;
+            var damageQ = Varus.CalculateDamage(d, DamageType.Physical, (float)new double[] { 12, 58, 104, 150, 196 }[Varus.SpellBook.GetSpell(SpellSlot.Q).Level - 1] + Varus.TotalAttackDamage / 100 * 132);
+            return (float)damageQ;
         }     
 
         public static readonly List<string> SpecialChampions = new List<string> { "Annie", "Jhin" };
@@ -39,6 +37,7 @@ namespace FrOnDaL_Varus
         {
             return SpecialChampions.Contains(target.ChampionName) ? 7 : 15;
         }
+        public static int GetBuffCount(Obj_AI_Base target) => target.GetBuffCount("VarusWDebuff");
 
         public FrOnDaLVarus()
         {
@@ -58,7 +57,7 @@ namespace FrOnDaL_Varus
             var combo = new Menu("combo", "Combo");
             {
                 combo.Add(new MenuBool("q", "Use Combo Q"));
-                //combo.Add(new MenuSliderBool("qstcW", "Minimum W stack for Q", false, 2, 1, 3));
+                combo.Add(new MenuSliderBool("qstcW", "Minimum W stack for Q", false, 2, 1, 3));
                 var whiteListQ = new Menu("whiteListQ", "Q White List");
                 {
                     foreach (var enemies in GameObjects.EnemyHeroes)
@@ -69,7 +68,7 @@ namespace FrOnDaL_Varus
                 combo.Add(whiteListQ);
                 combo.Add(new MenuBool("e", "Use Combo E"));
                 combo.Add(new MenuSlider("UnitsEhit", "E Hit x Units Enemy", 1, 1, 3));
-                //combo.Add(new MenuSliderBool("eStcW", "Minimum W stack for E", false, 2, 1, 3));
+                combo.Add(new MenuSliderBool("eStcW", "Minimum W stack for E", false, 1, 1, 3));
                 combo.Add(new MenuKeyBind("keyR", "R Key:", KeyCode.T, KeybindType.Press));
                 combo.Add(new MenuSlider("rHit", "Minimum enemies for R", 1, 1, 5));
                 var whiteListR = new Menu("whiteListR", "R White List");
@@ -115,6 +114,7 @@ namespace FrOnDaL_Varus
             var jungleclear = new Menu("jungleclear", "Jungle Clear")
             {
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 30, 0, 99),
+                new MenuSliderBool("jungW", "Minimum W stack for Q", false, 2, 1, 3),
                 new MenuSliderBool("e", "Use E / if Mana >= x%", true, 30, 0, 99)
             };
             Main.Add(jungleclear);
@@ -132,8 +132,7 @@ namespace FrOnDaL_Varus
 
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
-            Render.OnPresent += SpellDraw;
-            
+            Render.OnPresent += SpellDraw;           
             Orbwalker.PreAttack += (a, b) => IsPreAa = true;
             Orbwalker.PostAttack += (a, b) => { IsPreAa = false; IsAfterAa = true; };
         }
@@ -189,11 +188,10 @@ namespace FrOnDaL_Varus
 
             var targetC = TargetSelector.GetTarget(_q.ChargedMaxRange - 100);
             if (targetC == null) return;
-
             if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["combo"]["whiteListQ"]["qWhiteList" + targetC.ChampionName.ToLower()].As<MenuBool>().Enabled && _q.Ready)
             {
-                /*if (Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled && BuffW(target) && GoBuffW(target).Count >= Main["combo"]["qstcW"].As<MenuSliderBool>().Value || !Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled)
-                {*/                                               
+                if ((Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled && GetBuffCount(targetC) >= Main["combo"]["qstcW"].As<MenuSliderBool>().Value) || !Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled || _q.ChargePercent >= 100 || targetC.Health <= QDamage(targetC))
+                {                                             
                 if (!_q.IsCharging && !IsPreAa)
                 {
                     _q.StartCharging(_q.GetPrediction(targetC).CastPosition); return;
@@ -206,8 +204,7 @@ namespace FrOnDaL_Varus
                         if (prediction.HitChance >= HitChance.Medium)
                         {
                             _q.Cast(_q.GetPrediction(targetC).CastPosition);
-                        }
-                           
+                        }                     
                     }
                     else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 20)
                     {
@@ -217,27 +214,20 @@ namespace FrOnDaL_Varus
                         {
                             _q.Cast(_q.GetPrediction(targetC).CastPosition);
                         }
-
                     }
-               //}
+               }
         }
 
-            if (Main["combo"]["e"].As<MenuBool>().Enabled && targetC.IsValidTarget(_e.Range) && _e.Ready)
+            if (!Main["combo"]["e"].As<MenuBool>().Enabled || !targetC.IsValidTarget(_e.Range) || !_e.Ready) return;
+            if ((!Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled || GetBuffCount(targetC) < Main["combo"]["eStcW"].As<MenuSliderBool>().Value) && Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled) return;
+            foreach (var enemy in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(_e.Range)))
             {
-               /* if (Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled && BuffW(target) && GoBuffW(target).Count >=
-                    Main["combo"]["eStcW"].As<MenuSliderBool>().Value || !Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled)
-                { */                 
-                    foreach (var enemy in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(_e.Range)))
-                    {
-                        if (enemy == null) continue;
-                        if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_e.Width, false, true, _e.GetPrediction(enemy).CastPosition)) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value)
-                        {
-                            _e.Cast(targetC.Position);
-                        }
-                    }
-                //}
+                if (enemy == null) continue;
+                if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_e.Width, false, true, _e.GetPrediction(enemy).CastPosition)) >= Main["combo"]["UnitsEhit"].As<MenuSlider>().Value)
+                {
+                    _e.Cast(targetC.Position);
+                }
             }
-
         }
 
         /*Harass*/
@@ -262,15 +252,14 @@ namespace FrOnDaL_Varus
                 }
             }
 
-            if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["harass"]["e"].As<MenuSliderBool>().Value && !Varus.IsUnderEnemyTurret() && targetH.IsValidTarget(_e.Range) && _e.Ready)
+            if (!Main["harass"]["e"].As<MenuSliderBool>().Enabled || !(Varus.ManaPercent() > Main["harass"]["e"].As<MenuSliderBool>().Value) || Varus.IsUnderEnemyTurret() ||
+                !targetH.IsValidTarget(_e.Range) || !_e.Ready) return;
+            foreach (var enemy in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(_e.Range)))
             {
-                foreach (var enemy in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(_e.Range)))
+                if (enemy == null) continue;
+                if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_e.Width, false, false, _e.GetPrediction(enemy).CastPosition)) >= 1)
                 {
-                    if (enemy == null) continue;
-                    if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_e.Width, false, false, _e.GetPrediction(enemy).CastPosition)) >= 1)
-                    {
-                        _e.Cast(enemy.Position);
-                    }
+                    _e.Cast(enemy.Position);
                 }
             }
         }
@@ -300,7 +289,7 @@ namespace FrOnDaL_Varus
                 }
             }
 
-            if (Main["laneclear"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["laneclear"]["e"].As<MenuSliderBool>().Value && _e.Ready)
+            if (!Main["laneclear"]["e"].As<MenuSliderBool>().Enabled || !(Varus.ManaPercent() > Main["laneclear"]["e"].As<MenuSliderBool>().Value) || !_e.Ready) return;
             {
                 foreach (var targetE in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_e.Range)))
                 {
@@ -320,7 +309,10 @@ namespace FrOnDaL_Varus
             {
                 if (Main["jungleclear"]["q"].As<MenuSliderBool>().Enabled && targetJ.IsValidTarget(1000) && _q.Ready)
                 {
-                                                            
+                    if (Main["jungleclear"]["jungW"].As<MenuSliderBool>().Enabled && GetBuffCount(targetJ) >=
+                        Main["jungleclear"]["jungW"].As<MenuSliderBool>().Value || !Main["jungleclear"]["jungW"].As<MenuSliderBool>().Enabled || _q.ChargePercent >= 100)
+                    {
+                    
                     if (!_q.IsCharging && Varus.ManaPercent() >= Main["jungleclear"]["q"].As<MenuSliderBool>().Value)
                     {
                         if (!IsPreAa)
@@ -333,7 +325,8 @@ namespace FrOnDaL_Varus
                     else if (Varus.Distance(targetJ) < 700 && _q.ChargePercent >= 30)
                     {
                         _q.Cast(targetJ.Position);
-                    }               
+                    }
+                    }
                 }               
 
                 if (Main["jungleclear"]["e"].As<MenuSliderBool>().Enabled && Varus.ManaPercent() > Main["jungleclear"]["e"].As<MenuSliderBool>().Value && targetJ.IsValidTarget(_e.Range) && _e.Ready)
@@ -355,36 +348,34 @@ namespace FrOnDaL_Varus
             }
         }
 
+        /*W Stacks Damage*/
+        private static float StacksWDamage(Obj_AI_Base unit)
+        {
+            if (GetBuffCount(unit) == 0) return 0;
+            float[] damageStackW = { 0, 0.02f, 0.0275f, 0.035f, 0.0425f, 0.05f };
+            var stacksWCount = GetBuffCount(unit);
+            var extraDamage = 2 * (Varus.FlatMagicDamageMod / 100);
+            var damageW = unit.MaxHealth * damageStackW[Varus.SpellBook.GetSpell(SpellSlot.W).Level] * stacksWCount + (extraDamage - extraDamage % 2);
+            var expiryDamage = Varus.CalculateDamage(unit, DamageType.Magical, damageW > 360 && unit.GetType() != typeof(Obj_AI_Hero) ? 360 : damageW);
+            return (float)expiryDamage;
+        }
+
         /*Draw Damage Q */
         private static void DamageDraw()
         {
-            if (Main["drawings"]["drawDamage"].Enabled)
-            {
-                ObjectManager.Get<Obj_AI_Base>().Where(h => h is Obj_AI_Hero && h.IsValidTarget(1700)).ToList().ForEach(unit =>
-                {
-                    var heroUnit = unit as Obj_AI_Hero;
-                    const int width = 103;
-                    var xOffset = SxOffset(heroUnit);
-                    var yOffset = SyOffset(heroUnit);
-                    var barPos = unit.FloatingHealthBarPosition;
-                    barPos.X += xOffset;
-                    barPos.Y += yOffset;
-                    var drawEndXPos = barPos.X + width * (unit.HealthPercent() / 100);
-                    var drawStartXPos = (float)(barPos.X + (unit.Health > QDamage(unit) ? width * ((unit.Health - QDamage(unit)) / unit.MaxHealth * 100 / 100) : 0));
-                    Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, unit.Health < QDamage(unit) ? Color.GreenYellow : Color.ForestGreen);
-                });
+            if (!Main["drawings"]["drawDamage"].Enabled || Varus.SpellBook.GetSpell(SpellSlot.Q).Level <= 0) return;
+            foreach (var enemy in GameObjects.EnemyHeroes.Where(x => !x.IsDead && Varus.Distance(x) < 1700))
+            {                                    
+                const int width = 103;
+                var xOffset = SxOffset(enemy);
+                var yOffset = SyOffset(enemy);
+                var barPos = enemy.FloatingHealthBarPosition;
+                barPos.X += xOffset;
+                barPos.Y += yOffset;
+                var drawEndXPos = barPos.X + width * (enemy.HealthPercent() / 100);
+                var drawStartXPos = (float)(barPos.X + (enemy.Health > QDamage(enemy) + StacksWDamage(enemy) ? width * ((enemy.Health - (QDamage(enemy) + StacksWDamage(enemy))) / enemy.MaxHealth * 100 / 100) : 0));
+                Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, enemy.Health < QDamage(enemy) + StacksWDamage(enemy) ? Color.GreenYellow : Color.ForestGreen);                   
             }
         }
-
-        //private static float StacksWDamage(Obj_AI_Base unit)
-        //{
-        //    if (!BuffW(unit)) return 0;
-        //    float[] damageStackW = { 0, 0.02f, 0.0275f, 0.035f, 0.0425f, 0.05f };
-        //    var stacksWCount = GoBuffW(unit).Count;
-        //    var extraDamage = 2 * (Varus.FlatMagicDamageMod / 100);
-        //    var damageW = unit.MaxHealth * damageStackW[Varus.SpellBook.GetSpell(SpellSlot.W).Level] * stacksWCount + (extraDamage - extraDamage % 2);
-        //    var expiryDamage = Varus.CalculateDamage(unit, DamageType.Magical, damageW > 360 && unit.GetType() != typeof(Obj_AI_Hero) ? 360 : damageW);
-        //    return (float) expiryDamage;
-        //}       
     }
 }
