@@ -367,7 +367,7 @@ namespace FrOnDaL_Varus
             return (float)expiryDamage;
         }
 
-        /*Draw Damage Q */
+        /*Draw Damage Q*/
         private static void DamageDraw()
         {
             if (!Main["drawings"]["drawDamage"].Enabled || Varus.SpellBook.GetSpell(SpellSlot.Q).Level <= 0) return;
