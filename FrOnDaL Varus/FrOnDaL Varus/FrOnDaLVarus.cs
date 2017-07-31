@@ -1,4 +1,5 @@
-﻿using Aimtec;
+﻿using System;
+using Aimtec;
 using System.Linq;
 using System.Drawing;
 using Aimtec.SDK.Menu;
@@ -10,6 +11,7 @@ using Spell = Aimtec.SDK.Spell;
 using Aimtec.SDK.TargetSelector;
 using Aimtec.SDK.Menu.Components;
 using System.Collections.Generic;
+using Aimtec.SDK.Util.ThirdParty;
 using Aimtec.SDK.Prediction.Skillshots;
 
 namespace FrOnDaL_Varus
@@ -27,7 +29,6 @@ namespace FrOnDaL_Varus
             var damageQ = Varus.CalculateDamage(d, DamageType.Physical, (float)new double[] { 12, 58, 104, 150, 196 }[Varus.SpellBook.GetSpell(SpellSlot.Q).Level - 1] + Varus.TotalAttackDamage / 100 * 132);
             return (float)damageQ;
         }     
-
         public static readonly List<string> SpecialChampions = new List<string> { "Annie", "Jhin" };
         public static int SxOffset(Obj_AI_Hero target)
         {
@@ -87,7 +88,7 @@ namespace FrOnDaL_Varus
             {
                 harass.Add(new MenuBool("autoHarass", "Auto Harass", false));
                 harass.Add(new MenuKeyBind("keyHarass", "Harass Key:", KeyCode.C, KeybindType.Press));
-                harass.Add(new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 70, 0, 99));
+                harass.Add(new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 30, 0, 99));
                 var whiteListQ = new Menu("whiteListQ", "Q White List");
                 {
                     foreach (var enemies in GameObjects.EnemyHeroes)
@@ -96,7 +97,7 @@ namespace FrOnDaL_Varus
                     }
                 }
                 harass.Add(whiteListQ);
-                harass.Add(new MenuSliderBool("e", "Use E / if Mana >= x%", false, 70, 0, 99));
+                harass.Add(new MenuSliderBool("e", "Use E / if Mana >= x%", false, 30, 0, 99));
             }
             Main.Add(harass);
 
@@ -104,7 +105,7 @@ namespace FrOnDaL_Varus
             var laneclear = new Menu("laneclear", "Lane Clear")
             {
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 60, 0, 99),
-                new MenuSlider("UnitsQhit", "Q Hit x Units minions >= x%", 3, 1, 3),
+                new MenuSlider("UnitsQhit", "Q Hit x Units minions >= x%", 3, 1, 6),
                 new MenuSliderBool("e", "Use E / if Mana >= x%", false, 60, 0, 99),
                 new MenuSlider("UnitsEhit", "E Hit x Units minions >= x%", 3, 1, 4)
             };
@@ -190,7 +191,7 @@ namespace FrOnDaL_Varus
             if (targetC == null) return;
             if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["combo"]["whiteListQ"]["qWhiteList" + targetC.ChampionName.ToLower()].As<MenuBool>().Enabled && _q.Ready)
             {
-                if ((Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled && GetBuffCount(targetC) >= Main["combo"]["qstcW"].As<MenuSliderBool>().Value) || !Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled || _q.ChargePercent >= 100 || targetC.Health <= QDamage(targetC))
+                if ((Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled && Varus.Distance(targetC) < 750 && GetBuffCount(targetC) >= Main["combo"]["qstcW"].As<MenuSliderBool>().Value) || !Main["combo"]["qstcW"].As<MenuSliderBool>().Enabled || _q.ChargePercent >= 100 || targetC.Health <= QDamage(targetC) || Varus.Distance(targetC) > 800)
                 {                                             
                 if (!_q.IsCharging && !IsPreAa)
                 {
@@ -206,7 +207,7 @@ namespace FrOnDaL_Varus
                             _q.Cast(_q.GetPrediction(targetC).CastPosition);
                         }                     
                     }
-                    else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 20)
+                    else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 30)
                     {
                         var prediction = _q.GetPrediction(targetC);
 
@@ -219,7 +220,9 @@ namespace FrOnDaL_Varus
         }
 
             if (!Main["combo"]["e"].As<MenuBool>().Enabled || !targetC.IsValidTarget(_e.Range) || !_e.Ready) return;
-            if ((!Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled || GetBuffCount(targetC) < Main["combo"]["eStcW"].As<MenuSliderBool>().Value) && Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled) return;
+
+            if ((!Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled || !(Varus.Distance(targetC) < 700) ||
+                 GetBuffCount(targetC) < Main["combo"]["eStcW"].As<MenuSliderBool>().Value) && Main["combo"]["eStcW"].As<MenuSliderBool>().Enabled && !(Varus.Distance(targetC) > 750)) return;
             foreach (var enemy in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(_e.Range)))
             {
                 if (enemy == null) continue;
@@ -271,20 +274,24 @@ namespace FrOnDaL_Varus
             {
                 foreach (var targetL in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.ChargedMaxRange)))
                 {
-                    if (targetL == null) return;              
-                    if (Varus.ManaPercent() >= Main["laneclear"]["q"].As<MenuSliderBool>().Value && GameObjects.EnemyMinions.Count(t => t.IsValidTarget(150, false, true, _q.GetPrediction(targetL).CastPosition)) >= Main["laneclear"]["UnitsQhit"].As<MenuSlider>().Value && !Varus.IsUnderEnemyTurret() && !_q.IsCharging && !IsPreAa)
+                    var range = _q.IsCharging ? _q.Range : _q.ChargedMaxRange;
+                    var result = GetLineClearLocation(range, _q.Width);
+                    if (result == null) continue;
+                    if (Varus.ManaPercent() >= Main["laneclear"]["q"].As<MenuSliderBool>().Value &&
+                        result.NumberOfMinionsHit >= Main["laneclear"]["UnitsQhit"].As<MenuSlider>().Value &&
+                        !Varus.IsUnderEnemyTurret() && !_q.IsCharging && !IsPreAa)
                     {
-                        _q.StartCharging(_q.GetPrediction(targetL).CastPosition); return;
+                        _q.StartCharging(result.CastPosition);
+                        return;
                     }
                     if (!_q.IsCharging) return;
-                    if (Varus.Distance(targetL) > 700 && _q.ChargePercent >= 90)
+                    if (Varus.Distance(targetL) > 600 && _q.ChargePercent >= 90)
                     {
-                        _q.Cast(_q.GetPrediction(targetL).CastPosition);
+                        _q.Cast(result.CastPosition);
                     }
-                    else if (Varus.Distance(targetL) < 700 && _q.ChargePercent >= 30)
+                    else if (Varus.Distance(targetL) < 600 && _q.ChargePercent >= 65)
                     {
-                        _q.Cast(_q.GetPrediction(targetL).CastPosition);
-                        
+                        _q.Cast(result.CastPosition);
                     }
                 }
             }
@@ -376,6 +383,167 @@ namespace FrOnDaL_Varus
                 var drawStartXPos = (float)(barPos.X + (enemy.Health > QDamage(enemy) + StacksWDamage(enemy) ? width * ((enemy.Health - (QDamage(enemy) + StacksWDamage(enemy))) / enemy.MaxHealth * 100 / 100) : 0));
                 Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, enemy.Health < QDamage(enemy) + StacksWDamage(enemy) ? Color.GreenYellow : Color.ForestGreen);                   
             }
+        }
+
+        /*Polygon*/
+        public abstract class Polygon
+        {
+            public List<Vector3> Points = new List<Vector3>();
+
+            public List<IntPoint> ClipperPoints
+            {
+                get
+                {
+                    return Points.Select(p => new IntPoint(p.X, p.Z)).ToList();
+                }
+            }
+
+            public bool Contains(Vector3 point)
+            {
+                var p = new IntPoint(point.X, point.Z);
+                var inpolygon = Clipper.PointInPolygon(p, ClipperPoints);
+                return inpolygon == 1;
+            }
+        }
+        public class Rectangle : Polygon
+        {
+            public Rectangle(Vector3 startPosition, Vector3 endPosition, float width)
+            {
+                var direction = (startPosition - endPosition).Normalized();
+                var perpendicular = Perpendicular(direction);
+
+                var leftBottom = startPosition + width * perpendicular;
+                var leftTop = startPosition - width * perpendicular;
+
+                var rightBottom = endPosition - width * perpendicular;
+                var rightLeft = endPosition + width * perpendicular;
+
+                Points.Add(leftBottom);
+                Points.Add(leftTop);
+                Points.Add(rightBottom);
+                Points.Add(rightLeft);
+            }
+
+            public Vector3 Perpendicular(Vector3 v)
+            {
+                return new Vector3(-v.Z, v.Y, v.X);
+            }
+        }
+
+        /*Q Minions Location*/
+        public class LaneclearResult
+        {
+            public LaneclearResult(int hit, Vector3 cp)
+            {
+                NumberOfMinionsHit = hit;
+                CastPosition = cp;
+            }
+
+            public int NumberOfMinionsHit;
+            public Vector3 CastPosition;
+        }
+
+        public static LaneclearResult GetCircularClearLocation(float range, float width, int minHit)
+        {
+            var minions = ObjectManager.Get<Obj_AI_Base>().Where(x => x.IsValidSpellTarget(range));
+
+            var objAiBases = minions as Obj_AI_Base[] ?? minions.ToArray();
+            var positions = objAiBases.Select(x => x.ServerPosition.To2D()).ToList();
+
+            if (positions.Any() && minHit == 1)
+            {
+                return new LaneclearResult(1, positions.FirstOrDefault().To3D());
+            }
+
+            var positionCount = positions.Count;
+
+            var lcount = Math.Max(positionCount, 4);
+
+            if (positions.Count < minHit) return null;
+            {
+                Vector2 center;
+                float radius;
+
+                Mec.FindMinimalBoundingCircle(positions, out center, out radius);
+
+                var results = new HashSet<LaneclearResult>();
+
+                var center1 = center;
+                var radius1 = radius;
+                var hitMinions = objAiBases.Where(x => x.Distance(center1) <= 0.95f * radius1);
+
+                var count = hitMinions.Count();
+
+                var result = new LaneclearResult(count, center.To3D());
+
+                results.Add(result);
+
+                for (var i = 0; i < lcount; i++)
+                {
+                    for (var j = 0; j < count; j++)
+                    {
+                        if (i == j)
+                        {
+                            continue;
+                        }
+
+                        Mec.FindMinimalBoundingCircle(positions, out center, out radius);
+
+                        var center2 = center;
+                        var radius2 = radius;
+                        hitMinions = objAiBases.Where(x => x.Distance(center2) <= 0.9f * radius2);
+
+                        count = hitMinions.Count();
+
+                        if (count >= minHit)
+                        {
+                            results.Add(new LaneclearResult(count, center.To3D()));
+                        }
+                    }
+                }
+
+                return results.MaxBy(x => x.NumberOfMinionsHit);
+            }
+        }
+
+        public static LaneclearResult GetLineClearLocation(float range, float width)
+        {
+            var minions = ObjectManager.Get<Obj_AI_Base>().Where(x => x.IsValidSpellTarget(range));
+
+            var objAiBases = minions as Obj_AI_Base[] ?? minions.ToArray();
+            var positions = objAiBases.Select(x => x.ServerPosition).ToList();
+
+            var locations = new List<Vector3>();
+
+            locations.AddRange(positions);
+
+            var max = positions.Count;
+
+            for (var i = 0; i < max; i++)
+            {
+                for (var j = 0; j < max; j++)
+                {
+                    if (positions[j] != positions[i])
+                    {
+                        locations.Add((positions[j] + positions[i]) / 2);
+                    }
+                }
+            }
+
+            var results = new HashSet<LaneclearResult>();
+
+            foreach (var p in locations)
+            {
+                var rect = new Rectangle(Varus.Position, p, width);
+
+                var count = objAiBases.Count(m => rect.Contains(m.Position));
+
+                results.Add(new LaneclearResult(count, p));
+            }
+
+            var maxhit = results.MaxBy(x => x.NumberOfMinionsHit);
+
+            return maxhit;
         }
     }
 }
