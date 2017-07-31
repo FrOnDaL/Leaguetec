@@ -1,5 +1,4 @@
-﻿using System;
-using Aimtec;
+﻿using Aimtec;
 using System.Linq;
 using System.Drawing;
 using Aimtec.SDK.Menu;
@@ -275,7 +274,7 @@ namespace FrOnDaL_Varus
                 foreach (var targetL in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.ChargedMaxRange)))
                 {
                     var range = _q.IsCharging ? _q.Range : _q.ChargedMaxRange;
-                    var result = GetLineClearLocation(range, _q.Width);
+                    var result = GetLinearLocation(range, _q.Width);
                     if (result == null) continue;
                     if (Varus.ManaPercent() >= Main["laneclear"]["q"].As<MenuSliderBool>().Value &&
                         result.NumberOfMinionsHit >= Main["laneclear"]["UnitsQhit"].As<MenuSlider>().Value &&
@@ -443,70 +442,7 @@ namespace FrOnDaL_Varus
             public Vector3 CastPosition;
         }
 
-        public static LaneclearResult GetCircularClearLocation(float range, float width, int minHit)
-        {
-            var minions = ObjectManager.Get<Obj_AI_Base>().Where(x => x.IsValidSpellTarget(range));
-
-            var objAiBases = minions as Obj_AI_Base[] ?? minions.ToArray();
-            var positions = objAiBases.Select(x => x.ServerPosition.To2D()).ToList();
-
-            if (positions.Any() && minHit == 1)
-            {
-                return new LaneclearResult(1, positions.FirstOrDefault().To3D());
-            }
-
-            var positionCount = positions.Count;
-
-            var lcount = Math.Max(positionCount, 4);
-
-            if (positions.Count < minHit) return null;
-            {
-                Vector2 center;
-                float radius;
-
-                Mec.FindMinimalBoundingCircle(positions, out center, out radius);
-
-                var results = new HashSet<LaneclearResult>();
-
-                var center1 = center;
-                var radius1 = radius;
-                var hitMinions = objAiBases.Where(x => x.Distance(center1) <= 0.95f * radius1);
-
-                var count = hitMinions.Count();
-
-                var result = new LaneclearResult(count, center.To3D());
-
-                results.Add(result);
-
-                for (var i = 0; i < lcount; i++)
-                {
-                    for (var j = 0; j < count; j++)
-                    {
-                        if (i == j)
-                        {
-                            continue;
-                        }
-
-                        Mec.FindMinimalBoundingCircle(positions, out center, out radius);
-
-                        var center2 = center;
-                        var radius2 = radius;
-                        hitMinions = objAiBases.Where(x => x.Distance(center2) <= 0.9f * radius2);
-
-                        count = hitMinions.Count();
-
-                        if (count >= minHit)
-                        {
-                            results.Add(new LaneclearResult(count, center.To3D()));
-                        }
-                    }
-                }
-
-                return results.MaxBy(x => x.NumberOfMinionsHit);
-            }
-        }
-
-        public static LaneclearResult GetLineClearLocation(float range, float width)
+        public static LaneclearResult GetLinearLocation(float range, float width)
         {
             var minions = ObjectManager.Get<Obj_AI_Base>().Where(x => x.IsValidSpellTarget(range));
 
