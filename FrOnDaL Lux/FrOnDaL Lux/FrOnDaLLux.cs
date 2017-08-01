@@ -68,7 +68,7 @@ namespace FrOnDaL_Lux
             {
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", false, 60, 0, 99),
                 new MenuSliderBool("e", "Use E / if Mana >= x%", true, 60, 0, 99),
-                new MenuSlider("UnitsEhit", "E range Hit x Units minions >= x%", 3, 1, 7)
+                new MenuSlider("UnitsEhit", "E Hit x Units minions >= x%", 3, 1, 7)
             };
             Main.Add(laneclear);
 
