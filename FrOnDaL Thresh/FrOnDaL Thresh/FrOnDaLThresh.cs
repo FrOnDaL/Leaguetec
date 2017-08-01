@@ -36,11 +36,17 @@ namespace FrOnDaL_Thresh
                 new MenuBool("q", "Use Combo Q"),
                 new MenuBool("q2Turret", "Use Q2 Under Enemy Turret (On/Off)", false),
                 new MenuBool("q2", "Use Combo Q2 (On/Off)"),
+                new MenuSlider("QMinimumRange", "Q minimum range to cast", 400, 100, 600),
+                new MenuSlider("QMaximumRange", "Q Maximum range to cast", 1070, 600, 1070),
                 new MenuBool("w", "Use Combo W"),
                 new MenuBool("wAlly", "AA range in enemy, use Ally W", false),
                 //new MenuBool("wJung", "Use W To Ally Jungler"),
                 new MenuBool("e", "Use Combo E"),
+                new MenuList("ePP", "E Push/Pull", new []{ "Push", "Pull" }, 1),
+                new MenuKeyBind("keyFlee", "E Flee Key:", KeyCode.X, KeybindType.Press),
                 new MenuSliderBool("r", "Use Combo R - Minimum enemies for R",true, 3, 1, 5),
+                new MenuKeyBind("keyR", "Utli Key:", KeyCode.T, KeybindType.Press),
+                new MenuBool("disableAA", "Disable AutoAttacks", false)
             };
             var whiteList = new Menu("whiteList", "Q White List");
             {
@@ -67,8 +73,10 @@ namespace FrOnDaL_Thresh
             var harass = new Menu("harass", "Harass")
             {
                 new MenuBool("autoHarass", "Auto Harass", false),
-                new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 70, 0, 99),
-                new MenuSliderBool("e", "Use E / if Mana >= x%", false, 70, 0, 99),
+                new MenuSliderBool("q", "Auto Use Q / if Mana >= x%", true, 70, 0, 99),
+                new MenuSliderBool("e", "Auto Use E / if Mana >= x%", false, 70, 0, 99),
+                new MenuKeyBind("keyHarass", "Harass Key:", KeyCode.C, KeybindType.Press),
+                new MenuBool("EqHarass", "E after Use Q (E and Q If ready)")
             };
             Main.Add(harass);
 
@@ -85,6 +93,7 @@ namespace FrOnDaL_Thresh
 
             Game.OnUpdate += Game_OnUpdate;           
             Render.OnPresent += SpellDraw;
+            Orbwalker.PreAttack += OnPreAttack;
         }
 
         /*Drawings*/
@@ -116,8 +125,14 @@ namespace FrOnDaL_Thresh
                 case OrbwalkingMode.Combo:
                     Combo();
                     break;
+                case OrbwalkingMode.Mixed:
+                    ThreshEq();
+                    break;
+                case OrbwalkingMode.Lasthit:
+                    ThreshEflee();
+                    break;
             }
-            if (Main["harass"]["autoHarass"].As<MenuBool>().Enabled)
+            if (Main["harass"]["autoHarass"].As<MenuBool>().Enabled && Orbwalker.Mode != OrbwalkingMode.Combo && Orbwalker.Mode != OrbwalkingMode.Mixed)
             {
                 ThreshQ();
                 ThreshE();
@@ -125,6 +140,13 @@ namespace FrOnDaL_Thresh
             if (Main["autoW"]["wAuto"].As<MenuSliderBool>().Enabled && Thresh.ManaPercent() > Main["autoW"]["wAuto"].As<MenuSliderBool>().Value && _w.Ready)
             {
                 ThreshAutoW();
+            }
+            if (Main["combo"]["keyR"].As<MenuKeyBind>().Enabled)
+            {
+                if (Thresh.CountEnemyHeroesInRange(_r.Range - 50) >= 1)
+                {
+                    _r.Cast();
+                }
             }
         }
         /*Combo*/
@@ -138,16 +160,16 @@ namespace FrOnDaL_Thresh
 
         private static void ThreshQ()
         {
-            var target = TargetSelector.GetTarget(_q.Range);
+            var target = TargetSelector.GetTarget(Main["combo"]["QMaximumRange"].As<MenuSlider>().Value);
 
             if (target == null) return;           
             var prediction = _q.GetPrediction(target);
 
-            if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["whiteList"]["qWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && target.IsInRange(_q.Range) && target.IsValidTarget() && !target.HasBuff("threshQ") && _q.Ready)
+            if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["whiteList"]["qWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && target.IsInRange(_q.Range) && target.IsValidTarget() && !target.HasBuff("threshQ") && _q.Ready && target.Distance(Thresh) > Main["combo"]["QMinimumRange"].As<MenuSlider>().Value)
             {
-                if (prediction.HitChance >= HitChance.High && target.Distance(Thresh.ServerPosition) > 400)
+                if (prediction.HitChance >= HitChance.High)
                 {
-                    _q.Cast(prediction.UnitPosition);                                                   
+                    _q.Cast(prediction.CastPosition);                                                   
                 }                
             }
             if (target.HasBuff("threshQ") && Main["combo"]["q2"].As<MenuBool>().Enabled && !target.IsUnderEnemyTurret())
@@ -168,7 +190,7 @@ namespace FrOnDaL_Thresh
 
         private static void ThreshW()
         {
-            var ally = GameObjects.AllyHeroes.Where(x => x.IsInRange(_q.Range) && x.IsAlly && !x.IsMe).FirstOrDefault(x => x.Distance(Thresh.Position) <= 1300);
+            var ally = GameObjects.AllyHeroes.Where(x => x.IsInRange(_q.Range + 400) && !x.IsDead && x.IsAlly && !x.IsMe).FirstOrDefault(x => x.Distance(Thresh.Position) <= 1400);
             var target = TargetSelector.GetTarget(_q.Range);
             if (target == null) return;
             
@@ -188,7 +210,7 @@ namespace FrOnDaL_Thresh
 
         private static void ThreshAutoW()
         {
-            foreach (var ally in GameObjects.AllyHeroes.Where(x => x.IsInRange(_w.Range) && x.IsAlly && x.HealthPercent() <= Main["autoW"]["allyW" + x.ChampionName.ToLower()].Value && x.CountEnemyHeroesInRange(700) >= 1))
+            foreach (var ally in GameObjects.AllyHeroes.Where(x => x.IsInRange(_w.Range) && !x.IsDead && x.IsAlly && x.HealthPercent() <= Main["autoW"]["allyW" + x.ChampionName.ToLower()].Value && x.CountEnemyHeroesInRange(700) >= 1))
             {
                 if (ally.IsInRange(_w.Range) && !Thresh.IsRecalling() && Main["autoW"]["allyW" + ally.ChampionName.ToLower()].As<MenuSliderBool>().Enabled)
                 {
@@ -198,22 +220,86 @@ namespace FrOnDaL_Thresh
         }
 
         private static void ThreshE()
+        {         
+            var target = TargetSelector.GetTarget(_e.Range);
+            if (target == null) return;              
+            switch (Main["combo"]["ePP"].As<MenuList>().Value)
+            {
+                case 0:
+                    if (Main["combo"]["e"].As<MenuBool>().Enabled && target.IsInRange(_e.Range) && !target.HasBuff("threshQ") && _e.Ready)
+                    {
+                        _e.Cast(target.Position);
+                    }
+                    break;
+                case 1:
+                    if (Main["combo"]["e"].As<MenuBool>().Enabled && target.IsInRange(_e.Range) && !target.HasBuff("threshQ") && _e.Ready)
+                    {                                             
+                      _e.Cast(target.Position.Extend(Thresh.ServerPosition, Vector3.Distance(target.Position, Thresh.Position) + 400));   
+                    }               
+                    break;
+            }
+        }
+
+        private static void ThreshEq()
         {
-            var ally = GameObjects.AllyHeroes.Where(x => x.IsInRange(_w.Range) && x.IsAlly && !x.IsMe).FirstOrDefault(y => y.Distance(Thresh.Position) <= _w.Range);
+            if (Main["harass"]["EqHarass"].As<MenuBool>().Enabled)
+            {      
+            var target = TargetSelector.GetTarget(Main["combo"]["QMaximumRange"].As<MenuSlider>().Value);
+            if (target == null) return;
+            if (target.IsInRange(_e.Range) && !target.HasBuff("threshQ") && _e.Ready)
+            {
+                _e.Cast(target.Position.Extend(Thresh.ServerPosition, Vector3.Distance(target.Position, Thresh.Position) + 400));
+            }
+            var prediction = _q.GetPrediction(target);
+
+            if (Main["whiteList"]["qWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && target.IsInRange(_q.Range) && target.IsValidTarget() && !target.HasBuff("threshQ") && _q.Ready && target.Distance(Thresh) > _e.Range && !_e.Ready)
+            {
+                if (prediction.HitChance >= HitChance.High)
+                {
+                    _q.Cast(prediction.CastPosition);
+                }
+            }
+            if (target.HasBuff("threshQ") && Main["combo"]["q2"].As<MenuBool>().Enabled && !target.IsUnderEnemyTurret())
+            {
+                if (target.Distance(Thresh.ServerPosition) >= 400)
+                {
+                    DelayAction.Queue(1000, () => _q.CastOnUnit(Thresh));
+                }
+            }
+            if (target.HasBuff("threshQ") && target.IsUnderEnemyTurret() && Main["combo"]["q2Turret"].As<MenuBool>().Enabled)
+            {
+                if (target.Distance(Thresh.ServerPosition) >= 400)
+                {
+                    DelayAction.Queue(1000, () => _q.CastOnUnit(Thresh));
+                }
+            }
+
+            var ally = GameObjects.AllyHeroes.Where(x => x.IsInRange(_q.Range + 400) && !x.IsDead && x.IsAlly && !x.IsMe).FirstOrDefault(x => x.Distance(Thresh.Position) <= 1400);     
+
+            if (ally != null && _w.Ready)
+            {
+                if (ally.Distance(Thresh.ServerPosition) <= 700) return;
+                if (target.HasBuff("threshQ"))
+                {
+                    _w.Cast(ally.ServerPosition);
+                }
+                if (target.Distance(Thresh) <= 400 && Main["combo"]["wAlly"].As<MenuBool>().Enabled)
+                {
+                    _w.Cast(ally.ServerPosition);
+                }
+            }
+            }
+        }
+
+        private static void ThreshEflee()
+        {
             var target = TargetSelector.GetTarget(_e.Range);
             if (target == null) return;
-           
-            if (Main["combo"]["e"].As<MenuBool>().Enabled && target.IsInRange(_e.Range) && !target.HasBuff("threshQ") && _e.Ready)
-            {
-                if (ally == null && target.IsTurret)
-                {
-                    _e.Cast(target.Position);
-                }
-                else
-                {
-                    _e.Cast(target.Position.Extend(Thresh.ServerPosition, Vector3.Distance(target.Position, Thresh.Position) + 400));
-                }            
-            }
+          
+                    if (Main["combo"]["keyFlee"].As<MenuKeyBind>().Enabled && target.IsInRange(_e.Range) && _e.Ready)
+                    {
+                        _e.Cast(target.Position);
+                    }       
         }
 
         private static void ThreshR()
@@ -221,6 +307,26 @@ namespace FrOnDaL_Thresh
             if (Main["combo"]["r"].As<MenuSliderBool>().Enabled && Thresh.CountEnemyHeroesInRange(_r.Range - 50) >= Main["combo"]["r"].As<MenuSliderBool>().Value)
             {
                 _r.Cast();
+            }
+        }
+        public static void OnPreAttack(object sender, PreAttackEventArgs args)
+        {
+            switch (Orbwalker.Mode)
+            {
+          
+                case OrbwalkingMode.Mixed:
+                    if (!_e.Ready) return;                    
+                        args.Cancel = true;                                      
+                    break;   
+                              
+                case OrbwalkingMode.Combo:
+                case OrbwalkingMode.Lasthit:
+                case OrbwalkingMode.Laneclear:
+                    if (GameObjects.EnemyMinions.Contains(args.Target) && Main["combo"]["disableAA"].As<MenuBool>().Enabled)
+                    {
+                        args.Cancel = GameObjects.AllyHeroes.Any(a => !a.IsMe && a.Distance(Thresh) < 2500);
+                    }
+                    break;
             }
         }
     }
