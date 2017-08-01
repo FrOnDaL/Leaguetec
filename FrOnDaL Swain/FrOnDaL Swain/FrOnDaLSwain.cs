@@ -38,7 +38,7 @@ namespace FrOnDaL_Swain
             _r = new Spell(SpellSlot.R, 625);
 
             _q.SetSkillshot(0.250f, 325, 1250, false, SkillshotType.Circle);
-            _w.SetSkillshot(0.7f, 125f, 1200, false, SkillshotType.Circle);
+            _w.SetSkillshot(0.7f, 200f, 1200, false, SkillshotType.Circle);
 
             Orbwalker.Attach(Main);
 
@@ -48,6 +48,7 @@ namespace FrOnDaL_Swain
                 new MenuBool("q", "Use Combo Q"),
                 new MenuList("qHit", "Q Hitchances", new []{ "Low", "Medium", "High", "VeryHigh", "Dashing", "Immobile" }, 1),
                 new MenuBool("w", "Use Combo W"),
+                new MenuSlider("UnitsWhit", "W Hit x Units Enemy", 1, 1, 3),
                 new MenuList("wHit", "w Hitchances", new []{ "Low", "Medium", "High", "VeryHigh", "Dashing", "Immobile" }, 1),
                 new MenuBool("e", "Use Combo E"),
                 new MenuBool("r", "Use Combo R"),
@@ -60,7 +61,9 @@ namespace FrOnDaL_Swain
             var laneclear = new Menu("laneclear", "Lane Clear")
             {
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", true, 60, 0, 99),
+                new MenuSlider("UnitsQhit", "Q Hit x Units minions >= x%", 3, 1, 6),
                 new MenuSliderBool("w", "Use W / if Mana >= x%", true, 60, 0, 99),
+                new MenuSlider("UnitsWhit", "W Hit x Units minions >= x%", 3, 1, 6),
                 new MenuSliderBool("e", "Use E / if Mana >= x%", false, 60, 0, 99),
                 new MenuSliderBool("r", "Use R / if Mana >= x%", false, 60, 0, 99),
             };
@@ -147,47 +150,39 @@ namespace FrOnDaL_Swain
         /*Combo*/
         private static void Combo()
         {
-            if (Main["combo"]["w"].As<MenuBool>().Enabled && _w.Ready)
-            {
-                var target = TargetSelector.GetTarget(_w.Range);
-                if (target == null) return;
-                var prediction = _w.GetPrediction(target);
-             
-                    if (prediction.HitChance >= HitChance.High)
+            var target = TargetSelector.GetTarget(1500);
+            if (target != null)
+                if (Main["combo"]["w"].As<MenuBool>().Enabled && _w.Ready && target.IsValidTarget(_w.Range))
+                {
+                    if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_w.Width, false, true, _w.GetPrediction(target).CastPosition)) >= Main["combo"]["UnitsWhit"].As<MenuSlider>().Value)
                     {
-                        _w.Cast(prediction.CastPosition);
+                        _w.Cast(_w.GetPrediction(target).CastPosition);
                     }
+                }
+
+
+            if (Main["combo"]["q"].As<MenuBool>().Enabled && _q.Ready && target.IsValidTarget(_q.Range))
+            {
+                if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_q.Width, false, true, _q.GetPrediction(target).CastPosition)) >= 1)
+                {
+                    _q.Cast(_q.GetPrediction(target).CastPosition);
+                }
                 
             }
 
-            if (Main["combo"]["q"].As<MenuBool>().Enabled && _q.Ready)
+            if (Main["combo"]["e"].As<MenuBool>().Enabled && _e.Ready && target.IsValidTarget(_e.Range))
             {
-                var target = TargetSelector.GetTarget(_q.Range);
-                if (target == null) return;
-                var prediction = _q.GetPrediction(target);
-
-                    if (prediction.HitChance >= HitChance.High)
-                    {
-                        _q.Cast(prediction.CastPosition);
-                    }               
-            }
-
-            if (Main["combo"]["e"].As<MenuBool>().Enabled && _e.Ready)
-            {
-                var target = TargetSelector.GetTarget(_e.Range);
-                if (target == null) return;
+               
                 _e.CastOnUnit(target);
             }
 
-            if (Main["combo"]["r"].As<MenuBool>().Enabled && _r.Ready)
+            if (Main["combo"]["r"].As<MenuBool>().Enabled && _r.Ready )
             {
-                if (Swain.HasBuff("SwainMetamorphism") && Swain.CountEnemyHeroesInRange(750) == 0 && Main["combo"]["rClose"].As<MenuBool>().Enabled)
+                if (Swain.HasBuff("SwainMetamorphism") && Swain.CountEnemyHeroesInRange(800) == 0 && Main["combo"]["rClose"].As<MenuBool>().Enabled)
                 {
                     _r.Cast();
-                }
-                var target = TargetSelector.GetTarget(_r.Range);
-                if (target == null) return;
-                if (!Swain.HasBuff("SwainMetamorphism"))
+                }             
+                if (!Swain.HasBuff("SwainMetamorphism") && target.IsValidTarget(_r.Range))
                 {
                     _r.Cast();
                 }           
@@ -196,33 +191,26 @@ namespace FrOnDaL_Swain
         /*Harass*/
         private static void Harass()
         {
-            if (Main["harass"]["q"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["harass"]["q"].As<MenuSliderBool>().Value && _q.Ready)
+            var target = TargetSelector.GetTarget(1500);
+            if (target == null) return;
+            if (Main["harass"]["q"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["harass"]["q"].As<MenuSliderBool>().Value && _q.Ready && target.IsValidTarget(_q.Range))
             {
-                var target = TargetSelector.GetTarget(_q.Range);
-                if (target == null) return;
-                var prediction = _q.GetPrediction(target);
-                
-                    if (prediction.HitChance >= HitChance.Medium)
-                    {
-                        _q.Cast(prediction.CastPosition);
-                    }               
-            }
-
-            if (Main["harass"]["w"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["harass"]["w"].As<MenuSliderBool>().Value && _w.Ready)
-            {
-                var target = TargetSelector.GetTarget(_w.Range);
-                if (target == null) return;
-                var prediction = _w.GetPrediction(target);
-
-                if (prediction.HitChance >= HitChance.Medium)
+                if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_q.Width, false, true, _q.GetPrediction(target).CastPosition)) >= 1)
                 {
-                    _w.Cast(prediction.CastPosition);
+                    _q.Cast(_q.GetPrediction(target).CastPosition);
                 }
             }
-            if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["harass"]["e"].As<MenuSliderBool>().Value && _e.Ready)
+
+            if (Main["harass"]["w"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["harass"]["w"].As<MenuSliderBool>().Value && _w.Ready && target.IsValidTarget(_w.Range))
             {
-                var target = TargetSelector.GetTarget(_e.Range);
-                if (target == null) return;
+                if (GameObjects.EnemyHeroes.Count(t => t.IsValidTarget(_w.Width, false, true, _w.GetPrediction(target).CastPosition)) >= 1)
+                {
+                    _w.Cast(_w.GetPrediction(target).CastPosition);
+                }
+            }
+            if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["harass"]["e"].As<MenuSliderBool>().Value && _e.Ready && target.IsValidTarget(_e.Range))
+            {
+               
                 _e.CastOnUnit(target);
             }
         }
@@ -232,26 +220,24 @@ namespace FrOnDaL_Swain
         {
             if (Main["laneclear"]["w"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["laneclear"]["w"].As<MenuSliderBool>().Value && _w.Ready)
             {
-                foreach (var minion in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_w.Range)).ToList())
+                foreach (var target in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_w.Range)))
                 {
-                    if (!minion.IsValidTarget(_w.Range) || minion == null) continue;
-                    var countt = GameObjects.EnemyMinions.Count(x => x.IsValidTarget(_w.Range));
-                    if (countt >= 3)
+                    if (target == null) continue;
+                    if (GameObjects.EnemyMinions.Count(t => t.IsValidTarget(_w.Width, false, false, _w.GetPrediction(target).CastPosition)) >= Main["laneclear"]["UnitsWhit"].As<MenuSlider>().Value && !Swain.IsUnderEnemyTurret())
                     {
-                        _w.Cast(minion);
+                        _w.Cast(_w.GetPrediction(target).CastPosition);
                     }
                 }
             }
 
             if (Main["laneclear"]["q"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["laneclear"]["q"].As<MenuSliderBool>().Value && _q.Ready)
             {
-                foreach (var minion in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.Range)).ToList())
+                foreach (var target in GameObjects.EnemyMinions.Where(x => x.IsValidTarget(_q.Range)))
                 {
-                    if (!minion.IsValidTarget(_q.Range) || minion == null) continue;
-                    var countt = GameObjects.EnemyMinions.Count(x => x.IsValidTarget(_q.Range));
-                    if (countt >= 3)
+                    if (target == null) continue;
+                    if (GameObjects.EnemyMinions.Count(t => t.IsValidTarget(_q.Width, false, false, _q.GetPrediction(target).CastPosition)) >= Main["laneclear"]["UnitsQhit"].As<MenuSlider>().Value && !Swain.IsUnderEnemyTurret())
                     {
-                        _q.Cast(minion);
+                        _q.Cast(_q.GetPrediction(target).CastPosition);
                     }
                 }
             }
@@ -284,68 +270,39 @@ namespace FrOnDaL_Swain
             }
         }
 
-        public static List<Obj_AI_Minion> GetGenericJungleMinionsTargets()
-        {
-            return GetGenericJungleMinionsTargetsInRange(float.MaxValue);
-        }
-
-        public static List<Obj_AI_Minion> GetGenericJungleMinionsTargetsInRange(float range)
-        {
-            return GameObjects.Jungle.Where(x => (GameObjects.JungleSmall.Contains(x) || GameObjects.JungleLarge.Contains(x) || GameObjects.JungleLegendary.Contains(x)) && x.IsValidTarget(range)).ToList();
-        }
-
         /*JungleClear*/
         private static void JungleClear()
-        {  
-            if (Main["jungleclear"]["w"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["jungleclear"]["w"].As<MenuSliderBool>().Value && _w.Ready)
+        {
+            foreach (var targetJ in GameObjects.Jungle.Where(x => !GameObjects.JungleSmall.Contains(x) && (GameObjects.JungleLarge.Contains(x) || GameObjects.JungleLegendary.Contains(x)) && x.IsValidTarget(900)))
             {
-                foreach (var jungleTarget in GetGenericJungleMinionsTargetsInRange(_w.Range))
-                {
-                    if (jungleTarget.IsValidTarget(_w.Range) && GetGenericJungleMinionsTargets().Contains(jungleTarget) && jungleTarget.IsValidSpellTarget())
-                    {
-                        _w.Cast(jungleTarget);
-                    }
+                if (Main["jungleclear"]["w"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["jungleclear"]["w"].As<MenuSliderBool>().Value && _w.Ready && targetJ.IsValidTarget(_w.Range))
+                {                 
+                       
+                            _w.Cast(targetJ.Position);                                        
                 }
-            }
 
-            if (Main["jungleclear"]["q"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["jungleclear"]["q"].As<MenuSliderBool>().Value && _q.Ready)
-            {
-                foreach (var jungleTarget in GetGenericJungleMinionsTargetsInRange(_q.Range))
-                {
-                    if (jungleTarget.IsValidTarget(_q.Range) && GetGenericJungleMinionsTargets().Contains(jungleTarget) && jungleTarget.IsValidSpellTarget())
-                    {
-                        _q.Cast(jungleTarget);
-                    }
+                if (Main["jungleclear"]["q"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["jungleclear"]["q"].As<MenuSliderBool>().Value && _q.Ready && targetJ.IsValidTarget(_q.Range))
+                {                                      
+                            _q.Cast(targetJ.Position);                                       
                 }
-            }
 
-            if (Main["jungleclear"]["e"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["jungleclear"]["e"].As<MenuSliderBool>().Value && _e.Ready)
-            {
-                foreach (var jungleTarget in GetGenericJungleMinionsTargetsInRange(_e.Range))
-                {
-                    if (jungleTarget.IsValidTarget(_e.Range) && GetGenericJungleMinionsTargets().Contains(jungleTarget) && jungleTarget.IsValidSpellTarget())
-                    {                     
-                        _e.CastOnUnit(jungleTarget);
-                    }
+                if (Main["jungleclear"]["e"].As<MenuSliderBool>().Enabled && Swain.ManaPercent() > Main["jungleclear"]["e"].As<MenuSliderBool>().Value && _e.Ready && targetJ.IsValidTarget(_e.Range))
+                {                      
+                            _e.CastOnUnit(targetJ);             
                 }
-            }
 
-            if (Main["jungleclear"]["r"].As<MenuSliderBool>().Enabled &&  _r.Ready)
-            {
-                foreach (var jungleTarget in GetGenericJungleMinionsTargetsInRange(_r.Range))
-                {
-                    if (jungleTarget.IsValidTarget(_r.Range) && GetGenericJungleMinionsTargets().Contains(jungleTarget) && jungleTarget.IsValidSpellTarget() && !Swain.HasBuff("SwainMetamorphism") && Swain.ManaPercent() > Main["jungleclear"]["r"].As<MenuSliderBool>().Value)
-                    {
-                        _r.Cast(jungleTarget);      
-                                         
-                    }
-                   else if ( Swain.HasBuff("SwainMetamorphism") && Swain.ManaPercent() < Main["jungleclear"]["r"].As<MenuSliderBool>().Value)
-                    {
-                        _r.Cast();
-                    }
+                if (Main["jungleclear"]["r"].As<MenuSliderBool>().Enabled && _r.Ready)
+                {                   
+                        if (targetJ.IsValidTarget(_r.Range) && !Swain.HasBuff("SwainMetamorphism") && Swain.ManaPercent() > Main["jungleclear"]["r"].As<MenuSliderBool>().Value)
+                        {
+                            _r.Cast(targetJ);
+                        }
+                        else if (Swain.HasBuff("SwainMetamorphism") && Swain.ManaPercent() < Main["jungleclear"]["r"].As<MenuSliderBool>().Value)
+                        {
+                            _r.Cast();
+                        }                  
                 }
-            }
-            
+            }                   
         }
         /*Draw Damage Ulti */
         private static void DamageDraw()
