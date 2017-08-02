@@ -18,6 +18,7 @@ namespace FrOnDaL_Thresh
         public static Orbwalker Orbwalker = new Orbwalker();
         public static Obj_AI_Hero Thresh => ObjectManager.GetLocalPlayer();
         private static Spell _q, _w, _e, _r;
+        public static bool IsQActive => Thresh.SpellBook.GetSpell(SpellSlot.Q).SpellData.Name == "threshQ";
         public FrOnDaLThresh()
         {
             /*Spells*/
@@ -26,7 +27,8 @@ namespace FrOnDaL_Thresh
             _e = new Spell(SpellSlot.E, 500);
             _r = new Spell(SpellSlot.R, 450);
             _q.SetSkillshot(0.4f, 70f, 1400f, true, SkillshotType.Line);
-            _w.SetSkillshot(0.5f, 50f, 2200f, false, SkillshotType.Circle);    
+            _w.SetSkillshot(0.5f, 50f, 2200f, false, SkillshotType.Circle); 
+
 
             Orbwalker.Attach(Main);
 
@@ -177,15 +179,15 @@ namespace FrOnDaL_Thresh
                 if (target.Distance(Thresh.ServerPosition) >= 400)
                 {
                     DelayAction.Queue(1000, () => _q.CastOnUnit(Thresh));
-                }                                                           
+                }
             }
             if (target.HasBuff("threshQ") && target.IsUnderEnemyTurret() && Main["combo"]["q2Turret"].As<MenuBool>().Enabled)
             {
                 if (target.Distance(Thresh.ServerPosition) >= 400)
                 {
                     DelayAction.Queue(1000, () => _q.CastOnUnit(Thresh));
-                }
-            }
+                }            
+            }           
         }
 
         private static void ThreshW()
@@ -226,16 +228,16 @@ namespace FrOnDaL_Thresh
             switch (Main["combo"]["ePP"].As<MenuList>().Value)
             {
                 case 0:
-                    if (Main["combo"]["e"].As<MenuBool>().Enabled && target.IsInRange(_e.Range) && !target.HasBuff("threshQ") && _e.Ready)
+                    if (Main["combo"]["e"].As<MenuBool>().Enabled && target.IsInRange(_e.Range) && !IsQActive && _e.Ready)
                     {
                         _e.Cast(target.Position);
                     }
                     break;
                 case 1:
-                    if (Main["combo"]["e"].As<MenuBool>().Enabled && target.IsInRange(_e.Range) && !target.HasBuff("threshQ") && _e.Ready)
+                    if (Main["combo"]["e"].As<MenuBool>().Enabled && target.IsInRange(_e.Range) && !IsQActive && _e.Ready)
                     {                                             
                       _e.Cast(target.Position.Extend(Thresh.ServerPosition, Vector3.Distance(target.Position, Thresh.Position) + 400));   
-                    }               
+                    }              
                     break;
             }
         }
