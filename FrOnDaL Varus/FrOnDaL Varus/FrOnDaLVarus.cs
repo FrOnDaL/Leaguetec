@@ -199,7 +199,6 @@ namespace FrOnDaL_Varus
         /*Comob*/
         private static void Combo()
         {
-
             var targetC = TargetSelector.GetTarget(_q.ChargedMaxRange - 100);
             if (targetC == null) return;
             if (Main["combo"]["q"].As<MenuBool>().Enabled && Main["combo"]["whiteListQ"]["qWhiteList" + targetC.ChampionName.ToLower()].As<MenuBool>().Enabled && _q.Ready)
@@ -211,7 +210,7 @@ namespace FrOnDaL_Varus
                     _q.StartCharging(_q.GetPrediction(targetC).CastPosition); return;
                 }
                 if (!_q.IsCharging) return;              
-                    if (Varus.CountEnemyHeroesInRange(700) == 0 && _q.ChargePercent >= 100)
+                    if (Varus.Distance(targetC) < 750 && _q.ChargePercent >= 30 || Varus.Distance(targetC) > 750 && _q.ChargePercent >= 100)
                     {
                         var prediction = _q.GetPrediction(targetC);
 
@@ -219,15 +218,6 @@ namespace FrOnDaL_Varus
                         {
                             _q.Cast(_q.GetPrediction(targetC).CastPosition);
                         }                     
-                    }
-                    else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 30)
-                    {
-                        var prediction = _q.GetPrediction(targetC);
-
-                        if (prediction.HitChance >= HitChance.Medium)
-                        {
-                            _q.Cast(_q.GetPrediction(targetC).CastPosition);
-                        }
                     }
                }
         }
@@ -258,14 +248,10 @@ namespace FrOnDaL_Varus
                     _q.StartCharging(_q.GetPrediction(targetH).CastPosition); return;
                 }
                 if (!_q.IsCharging) return;
-                if (Varus.CountEnemyHeroesInRange(700) == 0 && _q.ChargePercent >= 100)
+                if (Varus.Distance(targetH) < 750 && _q.ChargePercent >= 30 || Varus.Distance(targetH) > 750 && _q.ChargePercent >= 100)
                 {
                     _q.Cast(_q.GetPrediction(targetH).CastPosition);
-                }
-                else if (Varus.CountEnemyHeroesInRange(700) >= 1 && _q.ChargePercent >= 20)
-                {
-                    _q.Cast(_q.GetPrediction(targetH).CastPosition);
-                }
+                }           
             }
 
             if (!Main["harass"]["e"].As<MenuSliderBool>().Enabled || !(Varus.ManaPercent() > Main["harass"]["e"].As<MenuSliderBool>().Value) || Varus.IsUnderEnemyTurret() ||
