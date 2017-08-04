@@ -21,6 +21,7 @@ namespace FrOnDaL_Velkoz
         public static Orbwalker Orbwalker = new Orbwalker();
         public static Obj_AI_Hero Velkoz => ObjectManager.GetLocalPlayer();
         private static Spell _q, _w, _e, _r;
+
         private static Vector3 _rCastPos;
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs args)
         {
@@ -48,9 +49,10 @@ namespace FrOnDaL_Velkoz
             _e = new Spell(SpellSlot.E, 810);
             _r = new Spell(SpellSlot.R, 1575);
 
-            _q.SetSkillshot(0.25f, 50, 1300, true, SkillshotType.Line);
-            _w.SetSkillshot(0.25f, 80, 1700, false, SkillshotType.Line);
-            _e.SetSkillshot(500, 120, 1500, false, SkillshotType.Circle);
+
+            _q.SetSkillshot(0.25f, 50f, 1300f, true, SkillshotType.Line);
+            _w.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.Line);
+            _e.SetSkillshot(0.5f, 120f, 1500f, false, SkillshotType.Circle);
             _r.SetSkillshot(0.3f, 1f, float.MaxValue, false, SkillshotType.Line);
 
             Orbwalker.Attach(Main);
@@ -116,7 +118,8 @@ namespace FrOnDaL_Velkoz
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Orbwalker.PreAttack += OnPreAttack;
         }
-      
+
+
         /*Drawings*/
         private static void SpellDraw()
         {
@@ -208,7 +211,7 @@ namespace FrOnDaL_Velkoz
 
                 if (Main["combo"]["e"].As<MenuBool>().Enabled && _e.Ready && targetC.IsValidTarget(_e.Range))
                 {
-                    var prediction = _e.GetPrediction(targetC);
+                    var prediction = _e.GetPrediction(targetC, Velkoz.Position, targetC.Position - 100);
                     if (prediction.HitChance >= HitChance.High)
                     {
                         _e.Cast(prediction.CastPosition);
@@ -245,7 +248,7 @@ namespace FrOnDaL_Velkoz
 
                 if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && _e.Ready && targetH.IsValidTarget(_e.Range))
                 {
-                    var prediction = _e.GetPrediction(targetH);
+                    var prediction = _e.GetPrediction(targetH, Velkoz.Position, targetH.Position - 100);
                     if (prediction.HitChance >= HitChance.High)
                     {
                         _e.Cast(prediction.CastPosition);
@@ -321,8 +324,8 @@ namespace FrOnDaL_Velkoz
             {
                 var target = TargetSelector.Implementation.GetOrderedTargets(_r.Range).FirstOrDefault(x => x.Health < RDamage(x));
                 if (target != null && Velkoz.Distance(target) > 350 && target.IsValidTarget(1300))
-                {
-                    _r.Cast(target.Position);
+                {           
+                        _r.Cast(target.Position);                           
                 }
             }         
         }

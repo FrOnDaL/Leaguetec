@@ -69,8 +69,9 @@ namespace FrOnDaL_Varus
                 combo.Add(new MenuBool("e", "Use Combo E"));
                 combo.Add(new MenuSlider("UnitsEhit", "E Hit x Units Enemy", 1, 1, 3));
                 combo.Add(new MenuSliderBool("eStcW", "Minimum W stack for E", false, 1, 1, 3));
-                combo.Add(new MenuKeyBind("keyR", "R Key:", KeyCode.T, KeybindType.Press));
+                combo.Add(new MenuKeyBind("keyR", "R Key:", KeyCode.T, KeybindType.Press));              
                 combo.Add(new MenuSlider("rHit", "Minimum enemies for R", 1, 1, 5));
+                combo.Add(new MenuSliderBool("autoR", "Auto R Minimum enemies for", false, 3, 1, 5));
                 var whiteListR = new Menu("whiteListR", "R White List");
                 {
                     foreach (var enemies in GameObjects.EnemyHeroes)
@@ -132,9 +133,11 @@ namespace FrOnDaL_Varus
 
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
-            Render.OnPresent += SpellDraw;           
+            Render.OnPresent += SpellDraw;
+            Orbwalker.PreAttack += OnPreAttack;
             Orbwalker.PreAttack += (a, b) => IsPreAa = true;
             Orbwalker.PostAttack += (a, b) => { IsPreAa = false; IsAfterAa = true; };
+
         }
 
         /*Drawings*/
@@ -179,6 +182,17 @@ namespace FrOnDaL_Varus
             if (Main["combo"]["keyR"].As<MenuKeyBind>().Enabled)
             {
                 ManualR();
+            }
+            if (Main["combo"]["autoR"].As<MenuSliderBool>().Enabled)
+            {
+                var targetR = TargetSelector.GetTarget(_r.Range - 100);
+                if (targetR == null) return;
+                var rHit = GameObjects.EnemyHeroes.Where(x => x.Distance(targetR) <= 450f).ToList();
+                if (Main["combo"]["whiteListR"]["rWhiteList" + targetR.ChampionName.ToLower()].As<MenuBool>().Enabled && _r.Ready &&
+                    targetR.IsInRange(_r.Range - 100) && targetR.IsValidTarget(_r.Range - 100) && rHit.Count >= Main["combo"]["autoR"].As<MenuSliderBool>().Value)
+                {
+                    _r.Cast(targetR.Position);
+                }
             }
         }
 
@@ -381,6 +395,23 @@ namespace FrOnDaL_Varus
                 var drawEndXPos = barPos.X + width * (enemy.HealthPercent() / 100);
                 var drawStartXPos = (float)(barPos.X + (enemy.Health > QDamage(enemy) + StacksWDamage(enemy) ? width * ((enemy.Health - (QDamage(enemy) + StacksWDamage(enemy))) / enemy.MaxHealth * 100 / 100) : 0));
                 Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, enemy.Health < QDamage(enemy) + StacksWDamage(enemy) ? Color.GreenYellow : Color.ForestGreen);                   
+            }
+        }
+
+        public static void OnPreAttack(object sender, PreAttackEventArgs args)
+        {
+            switch (Orbwalker.Mode)
+            {
+
+                case OrbwalkingMode.Combo:
+                case OrbwalkingMode.Mixed:
+                case OrbwalkingMode.Lasthit:
+                case OrbwalkingMode.Laneclear:
+                    if (Varus.HasBuff("VarusQ") && _q.IsCharging)
+                    {
+                        args.Cancel = true;
+                    }
+                    break;
             }
         }
 
