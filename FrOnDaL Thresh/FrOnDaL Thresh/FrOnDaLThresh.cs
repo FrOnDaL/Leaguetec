@@ -26,7 +26,7 @@ namespace FrOnDaL_Thresh
             _w = new Spell(SpellSlot.W, 950);
             _e = new Spell(SpellSlot.E, 500);
             _r = new Spell(SpellSlot.R, 450);
-            _q.SetSkillshot(0.4f, 70f, 1400f, true, SkillshotType.Line);
+            _q.SetSkillshot(0.5f, 70, 1900f, true, SkillshotType.Line);
             _w.SetSkillshot(0.5f, 50f, 2200f, false, SkillshotType.Circle); 
 
 
