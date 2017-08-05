@@ -66,11 +66,11 @@ namespace FrOnDaL_Veigar
             {
                 new MenuKeyBind("keyHarass", "Harass Key:", KeyCode.C, KeybindType.Press),
                 new MenuSlider("mana","Harass Mana Control", 30, 1 , 99),
-                new MenuBool("q", "Use Combo Q"),
-                new MenuBool("w2", "Use Combo W (On/Off)"),
-                new MenuList("w", "Use Combo W", new []{ "Normal", "Stun" }, 1),
-                new MenuBool("e2", "Use Combo E (On/Off)"),
-                new MenuList("e", "Use Combo E", new []{ "Normal", "Stun", "Normal 2" }, 0),
+                new MenuBool("q", "Use harass Q"),
+                new MenuBool("w2", "Use harass W (On/Off)"),
+                new MenuList("w", "Use harass W", new []{ "Normal", "Stun" }, 1),
+                new MenuBool("e2", "Use harass E (On/Off)"),
+                new MenuList("e", "Use harass E", new []{ "Normal", "Stun", "Normal 2" }, 0),
                 new MenuSlider("UnitsEhit", "Normal Mod Minimum enemies for E", 1, 1, 4),
             };
             Main.Add(harass);
