@@ -53,7 +53,7 @@ namespace FrOnDaL_Veigar
                 new MenuBool("w2", "Use Combo W (On/Off)"),
                 new MenuList("w", "Use Combo W", new []{ "Normal", "Stun" }, 0),
                 new MenuBool("e2", "Use Combo E (On/Off)"),
-                new MenuList("e", "Use Combo E", new []{ "Normal", "Stun","Normal 2" }, 1),
+                new MenuList("e", "Use Combo E", new []{ "Normal", "Stun","Normal 2" }, 0),
                 new MenuSlider("UnitsEhit", "Normal Mod Minimum enemies for E", 1, 1, 4),
                 new MenuSliderBool("r", "Use Combo R / Enemies Health", false, 30, 1, 99),
                 new MenuBool("rKillSteal", "Use Combo R KillSteal"),
@@ -70,7 +70,7 @@ namespace FrOnDaL_Veigar
                 new MenuBool("w2", "Use Combo W (On/Off)"),
                 new MenuList("w", "Use Combo W", new []{ "Normal", "Stun" }, 1),
                 new MenuBool("e2", "Use Combo E (On/Off)"),
-                new MenuList("e", "Use Combo E", new []{ "Normal", "Stun", "Normal 2" }, 1),
+                new MenuList("e", "Use Combo E", new []{ "Normal", "Stun", "Normal 2" }, 0),
                 new MenuSlider("UnitsEhit", "Normal Mod Minimum enemies for E", 1, 1, 4),
             };
             Main.Add(harass);
