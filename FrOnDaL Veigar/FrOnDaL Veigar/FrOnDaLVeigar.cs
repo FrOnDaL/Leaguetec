@@ -162,7 +162,7 @@ namespace FrOnDaL_Veigar
 
         public static void CastE(Obj_AI_Base target)
         {
-            var pred = Prediction.GetPrediction(target, _e.Delay);
+            var pred = _e.GetPrediction(target);
             var castVec = pred.UnitPosition.To2D() - Vector2.Normalize(pred.UnitPosition.To2D() - Veigar.Position.To2D()) * _e.Width;
             if (pred.HitChance >= HitChance.VeryHigh && _e.Ready)
             {
@@ -172,7 +172,7 @@ namespace FrOnDaL_Veigar
 
         public static void CastE(Obj_AI_Hero target)
         {
-            var pred = Prediction.GetPrediction(target, _e.Delay);
+            var pred = _e.GetPrediction(target);
             var castVec = pred.UnitPosition.To2D() - Vector2.Normalize(pred.UnitPosition.To2D() - Veigar.Position.To2D()) * _e.Width;
             if (pred.HitChance >= HitChance.VeryHigh && _e.Ready)
             {
@@ -397,7 +397,7 @@ namespace FrOnDaL_Veigar
 
         public static void CastE2(Obj_AI_Base target)
         {
-            var pred = Prediction.GetPrediction(target, _e.Delay);
+            var pred = _e.GetPrediction(target);
             var castVec = pred.UnitPosition.To2D() - Vector2.Normalize(pred.UnitPosition.To2D() - Veigar.Position.To2D()) * _e.Width + 60;
             if (pred.HitChance >= HitChance.VeryHigh && _e.Ready)
             {
@@ -407,7 +407,7 @@ namespace FrOnDaL_Veigar
 
         public static void CastE2(Obj_AI_Hero target)
         {
-            var pred = Prediction.GetPrediction(target, _e.Delay);
+            var pred = _e.GetPrediction(target);
             var castVec = pred.UnitPosition.To2D() - Vector2.Normalize(pred.UnitPosition.To2D() - Veigar.Position.To2D()) * _e.Width + 60;
             if (pred.HitChance >= HitChance.VeryHigh && _e.Ready)
             {
