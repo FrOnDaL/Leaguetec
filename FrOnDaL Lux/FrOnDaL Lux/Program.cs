@@ -1,7 +1,7 @@
 ﻿using System;
 using Aimtec;
 using Aimtec.SDK.Events;
-
+// Test
 namespace FrOnDaL_Lux
 {
     internal class Program
