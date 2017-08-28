@@ -452,8 +452,7 @@ namespace FrOnDaL_AIO.Champions
         private static void DamageDraw()
         {
             if (!Main["drawDamage"]["enabled"].Enabled) return;
-            if (!Main["drawDamage"]["enabled"].Enabled) return;
-            foreach (var enemy in GameObjects.EnemyHeroes.Where(x => !x.IsDead && Player.Distance(x) < 1700))
+            foreach (var enemy in GameObjects.EnemyHeroes.Where(x => !x.IsDead && x.IsVisible && Player.Distance(x) < 1700))
             {
                 float qdmgDraw = 0, wdmgDraw = 0, edmgDraw = 0, rdmgDraw = 0;
                 if (Q.Ready && Main["drawDamage"]["q"].As<MenuBool>().Enabled)
@@ -483,6 +482,6 @@ namespace FrOnDaL_AIO.Champions
                 var drawStartXPos = (barPos.X + (enemy.Health > damage ? 103 * ((enemy.Health - damage) / enemy.MaxHealth * 100 / 100) : 0));
                 Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, enemy.Health < damage ? Color.GreenYellow : Color.ForestGreen);
             }
-        }
+        }      
     }
 }
