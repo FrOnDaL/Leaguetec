@@ -98,7 +98,6 @@ namespace FrOnDaL_AIO.Champions
                         drawDamage.Add(new MenuBool("enabled", "Enabled"));
                         drawDamage.Add(new MenuBool("q", "Draw Q damage", false));
                         drawDamage.Add(new MenuBool("w", "Draw W damage", false));
-                        drawDamage.Add(new MenuBool("e", "Draw E damage", false));
                         drawDamage.Add(new MenuBool("r", "Draw R damage"));
 
                     }
@@ -550,7 +549,7 @@ namespace FrOnDaL_AIO.Champions
                 {
                     wdmgDraw = WDamage(enemy);
                 }
-                if (E.Ready && Main["drawDamage"]["e"].As<MenuBool>().Enabled)
+                if (E.Ready)
                 {
                     edmgDraw = EDamage();
                 }
