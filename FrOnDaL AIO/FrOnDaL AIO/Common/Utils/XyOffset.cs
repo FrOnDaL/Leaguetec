@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Aimtec;
+﻿using Aimtec;
 
 
 namespace FrOnDaL_AIO.Common.Utils
