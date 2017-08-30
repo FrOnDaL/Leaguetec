@@ -25,6 +25,7 @@ namespace FrOnDaL_AIO.Common
         public static Spell E2 { get; set; }
         public static Spell R { get; set; }
         public static Spell R2 { get; set; }
+        public static Spell Flash { get; set; }
         public static Menu Main { get; set; }
         public static IOrbwalker Orbwalker => Aimtec.SDK.Orbwalking.Orbwalker.Implementation;
         public static Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();

@@ -42,6 +42,10 @@ namespace FrOnDaL_AIO
                         var unused5 = new Lux();
                         Console.WriteLine("FrOnDaL AIO Lux loaded");
                         break;
+                    case "Shen":
+                        var unused6 = new Shen();
+                        Console.WriteLine("FrOnDaL AIO Shen loaded");
+                        break;
                 }
             }
             catch (Exception)

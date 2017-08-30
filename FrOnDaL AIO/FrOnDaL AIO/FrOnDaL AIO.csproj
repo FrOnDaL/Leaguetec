@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Champions\Jhin.cs" />
     <Compile Include="Champions\Lux.cs" />
+    <Compile Include="Champions\Shen.cs" />
     <Compile Include="Champions\Swain.cs" />
     <Compile Include="Champions\Thresh.cs" />
     <Compile Include="Champions\Varus.cs" />

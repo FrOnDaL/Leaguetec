@@ -52,7 +52,7 @@ namespace FrOnDaL_AIO.Champions
                     combo.Add(new MenuBool("e", "Use combo E"));
                     combo.Add(new MenuSlider("UnitsEhit", "E hit x units enemy", 1, 1, 3));
                     combo.Add(new MenuSliderBool("eStcW", "Minimum W stack for E", false, 1, 1, 3));
-                    combo.Add(new MenuKeyBind("keyR", "R key:", KeyCode.T, KeybindType.Press));
+                    combo.Add(new MenuKeyBind("keyR", "Semi-manual cast R key", KeyCode.T, KeybindType.Press));
                     combo.Add(new MenuSlider("rHit", "Minimum enemies for R", 1, 1, 5));
                     combo.Add(new MenuSliderBool("autoR", "Auto R minimum enemies for", false, 3, 1, 5));
                     var whiteListR = new Menu("whiteListR", "R white list");
@@ -482,6 +482,6 @@ namespace FrOnDaL_AIO.Champions
                 var drawStartXPos = (barPos.X + (enemy.Health > damage ? 103 * ((enemy.Health - damage) / enemy.MaxHealth * 100 / 100) : 0));
                 Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, enemy.Health < damage ? Color.GreenYellow : Color.ForestGreen);
             }
-        }      
+        }
     }
 }

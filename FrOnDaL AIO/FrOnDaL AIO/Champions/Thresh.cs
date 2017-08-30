@@ -43,7 +43,7 @@ namespace FrOnDaL_AIO.Champions
                     combo.Add(new MenuBool("qDash", "Auto Q dash"));
                     combo.Add(new MenuBool("q2", "Use combo Q2"));
                     combo.Add(new MenuBool("q2Turret", "Use Q2 Under Enemy Turret", false));
-                    combo.Add(new MenuSlider("QMinimumRange", "Q minimum range to cast", 250, 125, 600));
+                    combo.Add(new MenuSlider("QMinimumRange", "Q minimum range to cast", 250, 125, 1070));
                     combo.Add(new MenuSlider("QMaximumRange", "Q Maximum range to cast", 1070, 600, 1070));
                     var whiteList = new Menu("whiteList", "Q white list");
                     {
