@@ -1,4 +1,5 @@
-﻿using Aimtec;
+﻿using System.Collections.Generic;
+using Aimtec;
 using System.Linq;
 using System.Drawing;
 using Aimtec.SDK.Menu;
@@ -10,6 +11,7 @@ using Aimtec.SDK.Extensions;
 using FrOnDaL_AIO.Common.Utils;
 using Spell = Aimtec.SDK.Spell;
 using Aimtec.SDK.Menu.Components;
+using Aimtec.SDK.Prediction.Collision;
 using static FrOnDaL_AIO.Common.Misc;
 using Aimtec.SDK.Prediction.Skillshots;
 using static FrOnDaL_AIO.Common.Utils.XyOffset;
@@ -221,7 +223,9 @@ namespace FrOnDaL_AIO.Champions
                             {
                                 if (!target.HasBuffOfType(BuffType.SpellImmunity) && !target.HasBuffOfType(BuffType.SpellShield) && GameObjects.EnemyMinions.Count(x => Player.Distance(x.Position) <= 200) == 0)
                                 {
-                                    if (pred.HitChance >= HitChance.High && pred.CollisionObjects.Count == 0)
+                                    var collision = Collision.GetCollision(new List<Vector3> { target.ServerPosition }, Q.GetPredictionInput(target));
+                                    var col = collision.Count(x => x.IsEnemy && x.IsMinion);
+                                if (pred.HitChance >= HitChance.High && col == 0)
                                     {
                                         Q.Cast(pred.CastPosition);
                                     }
@@ -288,11 +292,13 @@ namespace FrOnDaL_AIO.Champions
                 {
                     if (!target.HasBuffOfType(BuffType.SpellImmunity) && !target.HasBuffOfType(BuffType.SpellShield) && GameObjects.EnemyMinions.Count(x => Player.Distance(x.Position) <= 200) == 0)
                     {
-                        if (Main["combo"]["qCC"].As<MenuBool>().Enabled && pred.HitChance == HitChance.Immobile && pred.CollisionObjects.Count == 0 && target.IsImmobile())
+                        var collision = Collision.GetCollision(new List<Vector3> { target.ServerPosition }, Q.GetPredictionInput(target));
+                        var col = collision.Count(x => x.IsEnemy && x.IsMinion);
+                        if (Main["combo"]["qCC"].As<MenuBool>().Enabled && pred.HitChance == HitChance.Immobile && col == 0 && target.IsImmobile())
                         {
                             Q.Cast(pred.CastPosition);
                         }
-                        if (Main["combo"]["qDash"].As<MenuBool>().Enabled && pred.HitChance == HitChance.Dashing && pred.CollisionObjects.Count == 0)
+                        if (Main["combo"]["qDash"].As<MenuBool>().Enabled && pred.HitChance == HitChance.Dashing && col == 0)
                         {
                             Q.Cast(pred.CastPosition);
                         }
@@ -331,7 +337,9 @@ namespace FrOnDaL_AIO.Champions
                 {
                     if (!target.HasBuffOfType(BuffType.SpellImmunity) && !target.HasBuffOfType(BuffType.SpellShield) && GameObjects.EnemyMinions.Count(x => Player.Distance(x.Position) <= 200) == 0)
                     {
-                        if (pred.HitChance == HitChance.High && pred.CollisionObjects.Count == 0)
+                        var collision = Collision.GetCollision(new List<Vector3> { target.ServerPosition }, Q.GetPredictionInput(target));
+                        var col = collision.Count(x => x.IsEnemy && x.IsMinion);
+                        if (pred.HitChance == HitChance.High && col == 0)
                         {
                             Q.Cast(pred.CastPosition);
                         }
@@ -413,7 +421,9 @@ namespace FrOnDaL_AIO.Champions
                     {
                         if (!target.HasBuffOfType(BuffType.SpellImmunity) && !target.HasBuffOfType(BuffType.SpellShield) && GameObjects.EnemyMinions.Count(x => Player.Distance(x.Position) <= 200) == 0)
                         {
-                            if (pred.HitChance >= HitChance.High && pred.CollisionObjects.Count == 0)
+                            var collision = Collision.GetCollision(new List<Vector3> { target.ServerPosition }, Q.GetPredictionInput(target));
+                            var col = collision.Count(x => x.IsEnemy && x.IsMinion);
+                            if (pred.HitChance >= HitChance.High && col == 0)
                             {
                                 Q.Cast(pred.CastPosition);
                             }
@@ -480,7 +490,9 @@ namespace FrOnDaL_AIO.Champions
 
                 if (Main["whiteList"]["qWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled && target.IsInRange(Q.Range) && target.IsValidTarget() && !target.HasBuff("threshQ") && Q.Ready && target.Distance(Player) > E.Range && !E.Ready && !Check(target, DamageType.Magical))
                 {
-                    if (prediction.HitChance >= HitChance.High)
+                    var collision = Collision.GetCollision(new List<Vector3> { target.ServerPosition }, Q.GetPredictionInput(target));
+                    var col = collision.Count(x => x.IsEnemy && x.IsMinion);
+                    if (prediction.HitChance >= HitChance.High && col == 0)
                     {
                         Q.Cast(prediction.CastPosition);
                     }

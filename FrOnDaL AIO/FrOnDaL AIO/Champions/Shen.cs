@@ -19,7 +19,7 @@ namespace FrOnDaL_AIO.Champions
 {
     internal class Shen
     {
-        public Shen ()
+        public Shen()
         {
             Q = new Spell(SpellSlot.Q);
             W = new Spell(SpellSlot.W);

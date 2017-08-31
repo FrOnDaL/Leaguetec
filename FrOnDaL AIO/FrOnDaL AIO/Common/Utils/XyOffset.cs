@@ -67,6 +67,7 @@ namespace FrOnDaL_AIO.Common.Utils
                 case "Ziggs": _y = 15; break;
                 case "Zyra": _y = 15; break;
                 case "Zilean": _y = 16; break;
+                case "MissFortune": _y = 15; break;
 
                 default: _y = 18; break;
             }
