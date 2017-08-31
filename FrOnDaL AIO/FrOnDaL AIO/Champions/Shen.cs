@@ -25,7 +25,7 @@ namespace FrOnDaL_AIO.Champions
             W = new Spell(SpellSlot.W);
             E = new Spell(SpellSlot.E, 600);
             R = new Spell(SpellSlot.R, 35000);
-            E.SetSkillshot(250, 50, 1600, false, SkillshotType.Line);
+            E.SetSkillshot(0.20f, 100f, float.MaxValue, false, SkillshotType.Line);
             if (Player.SpellBook.GetSpell(SpellSlot.Summoner1).SpellData.Name == "SummonerFlash")
             {
                 Flash = new Spell(SpellSlot.Summoner1, 425);
@@ -43,6 +43,9 @@ namespace FrOnDaL_AIO.Champions
                 var combo = new Menu("combo", "Combo");
                 {
                     combo.Add(new MenuBool("q", "Use combo Q"));
+                    combo.Add(new MenuBool("w", "Use combo W"));
+                    combo.Add(new MenuSliderBool("autoW", "Auto W Protect / if energy >= x% (AA)", true, 0, 0, 99));
+                    combo.Add(new MenuBool("autoWS", "Use Auto W Protect / Shen sword in", false));
                     combo.Add(new MenuBool("e", "Use combo E"));
                     combo.Add(new MenuKeyBind("eF", "Use combo flash E key:", KeyCode.T, KeybindType.Press));
                     var whiteList2 = new Menu("ehiteList2", "Flash E settings");
@@ -65,17 +68,6 @@ namespace FrOnDaL_AIO.Champions
                     combo.Add(whiteList);
                 }
                 shen.Add(combo);
-
-                var wProtect = new Menu("wProtect", "Auto W Protect");
-                {
-                    wProtect.Add(new MenuSliderBool("autoW", "Auto W Protect / if energy >= x% (AA)", true, 30, 0, 99));
-
-                        foreach (var ally in GameObjects.AllyHeroes)
-                        {
-                            wProtect.Add(new MenuSliderBool("allyW" + ally.ChampionName.ToLower(), ally.ChampionName + " health <= x%", true, 100, 0, 101));
-                        }
-                }
-                shen.Add(wProtect);
 
                 var rProtect = new Menu("rProtect", "Ulti Protect");
                 {
@@ -151,7 +143,7 @@ namespace FrOnDaL_AIO.Champions
             Render.OnPresent += DamageDraw;
             Render.OnPresent += AllyHealt;
             Gapcloser.OnGapcloser += AntiGapcloser;
-            Obj_AI_Base.OnProcessAutoAttack += AutoAttack;           
+            Obj_AI_Base.OnProcessAutoAttack += AutoAttack;
         }
 
         private static void SpellDraw()
@@ -252,9 +244,13 @@ namespace FrOnDaL_AIO.Champions
             {            
                 if (Q.Ready && target.IsValidTarget(600))
                 {       
-                   if (target.Distance(Player) < 150)
+                   if (target.Distance(Player) < 200)
                    {
-                        Q.Cast();
+                       Q.Cast();
+                       if (Main["combo"]["w"].As<MenuBool>().Enabled && W.Ready)
+                       {
+                           W.Cast();
+                       }
                    }           
                 }
             }
@@ -263,15 +259,13 @@ namespace FrOnDaL_AIO.Champions
             {
                 if (Main["ehiteList"]["eWhiteList" + target.ChampionName.ToLower()].As<MenuBool>().Enabled || target.HealthPercent() <= 15)
                 {
-                    if (Player.Distance(target.Position) < E.Range && Player.Distance(target.Position) > 450)
-                    {
-                        E.Cast(target);  
-                    }
-                    if (Player.Distance(target.Position) < 450)
-                    {
-                        E.Cast(target.Position.Extend(Player.ServerPosition, Vector3.Distance(target.Position, Player.Position) - 800));
-                    }                 
+                    CastE(target);                              
                 }
+            }
+
+            if (Main["combo"]["w"].As<MenuBool>().Enabled && W.Ready && target.Distance(Player) < 200 && !Q.Ready)
+            {
+                W.Cast();
             }
         }
 
@@ -279,18 +273,22 @@ namespace FrOnDaL_AIO.Champions
         {
             var attack = sender as Obj_AI_Hero;
             var target = args.Target as Obj_AI_Hero;
-            if (attack != null && attack.IsEnemy && attack.IsHero && Main["wProtect"]["autoW"].As<MenuSliderBool>().Enabled && Player.ManaPercent() >= Main["wProtect"]["autoW"].As<MenuSliderBool>().Value && W.Ready)
+            if (attack != null && attack.IsEnemy && attack.IsHero && Main["combo"]["autoW"].As<MenuSliderBool>().Enabled && Player.ManaPercent() >= Main["combo"]["autoW"].As<MenuSliderBool>().Value && W.Ready)
             {
-                foreach (var ally in GameObjects.AllyHeroes.Where(x => !x.IsDead))
+                foreach (var ally in GameObjects.AllyHeroes.Where(x => !x.IsDead && x.IsMe))
                 {
-                    if (target != null && ally.CountEnemyHeroesInRange(800) >= 1)
+                    if (target != null)
                     {
                         foreach (var sword in GameObjects.AllGameObjects)
                         {
-                            if (sword.Name == "ShenSpiritUnit" && ally.Distance(sword.Position) <= 350 && ally.HealthPercent() <= Main["wProtect"]["allyW" + ally.ChampionName.ToLower()].As<MenuSliderBool>().Value && Main["wProtect"]["allyW" + ally.ChampionName.ToLower()].As<MenuSliderBool>().Enabled)
+                            if (sword.Name == "ShenSpiritUnit" && ally.Distance(sword.Position) <= 350 && Main["combo"]["autoWS"].As<MenuBool>().Enabled)
                             {
                                 W.Cast();
                             }
+                            else if(!Main["combo"]["autoWS"].As<MenuBool>().Enabled)
+                            {
+                                W.Cast();
+                            }   
                         }                       
                     }
                 }
@@ -362,7 +360,7 @@ namespace FrOnDaL_AIO.Champions
 
                 if (Main["jungleclear"]["e"].As<MenuSliderBool>().Enabled && Player.ManaPercent() > Main["jungleclear"]["e"].As<MenuSliderBool>().Value && E.Ready && target.IsValidTarget(600))
                 {
-                    E.Cast(target.Position);
+                    CastE(target);
                 }
             }
         }
@@ -445,7 +443,15 @@ namespace FrOnDaL_AIO.Champions
                 i += 20f + 5;
             }
         }
+        public static void CastE(Obj_AI_Base t)
+        {
 
+            var hithere = t.Position + Vector3.Normalize(t.ServerPosition - Player.Position) * 60;
+            if (hithere.Distance(Player.Position) < E.Range)
+            {
+                E.Cast(hithere);
+            }
+        }
         private static void DamageDraw()
         {
             if (!Main["drawDamage"]["enabled"].Enabled) return;
