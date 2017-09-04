@@ -50,6 +50,10 @@ namespace FrOnDaL_AIO
                         var unused7 = new DrMundo();
                         Console.WriteLine("FrOnDaL AIO Dr.Mundo loaded");
                         break;
+                    case "JarvanIV":
+                        var unused8 = new JarvanIv();
+                        Console.WriteLine("FrOnDaL AIO Jarvan IV loaded");
+                        break;
                 }
             }
             catch (Exception)
