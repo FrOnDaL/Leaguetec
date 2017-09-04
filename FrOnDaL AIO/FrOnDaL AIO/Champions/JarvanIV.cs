@@ -50,7 +50,7 @@ namespace FrOnDaL_AIO.Champions
                     new MenuBool("w", "Use combo W"),
                     new MenuSlider("wEnemy", "Minimum enemies for use W", 1, 1, 5),
                     new MenuBool("e", "Use combo E"),
-                    new MenuBool("eQ", "Save E For EQ"),
+                    new MenuBool("eQ", "Save E For E-Q"),
                     new MenuKeyBind("r", "Semi-manual R key", KeyCode.S, KeybindType.Press),
                     new MenuBool("rKS", "Auto R kill-steal"),
                     new MenuSliderBool("autoR", "Auto R minimum enemies for >= x", true, 3, 1, 5),

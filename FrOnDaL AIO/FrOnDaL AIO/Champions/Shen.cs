@@ -285,7 +285,7 @@ namespace FrOnDaL_AIO.Champions
                             {
                                 W.Cast();
                             }
-                            else if(!Main["combo"]["autoWS"].As<MenuBool>().Enabled)
+                            else if(!Main["combo"]["autoWS"].As<MenuBool>().Enabled && Player.CountEnemyHeroesInRange(650) >= 1)
                             {
                                 W.Cast();
                             }   
@@ -306,6 +306,7 @@ namespace FrOnDaL_AIO.Champions
                     {
                         if (ally.CountEnemyHeroesInRange(ally.IsUnderAllyTurret() ? 550 : 350 + 350) >= 1)
                         {
+                            R.CastOnUnit(ally);
                             if (GetProtection(ally.ChampionName.ToLower()) == 3)
                             {
                                 R.CastOnUnit(ally);
