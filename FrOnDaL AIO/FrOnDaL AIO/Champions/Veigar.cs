@@ -80,12 +80,12 @@ namespace FrOnDaL_AIO.Champions
                 };
                 veigar.Add(jungleclear);
 
-                var antiGapcloser = new Menu("antiGapcloser", "Veigar anti-gapcloser spells")
-                {
-                    new MenuBool("e", "Anti-gapcloser E")
-                };
-                veigar.Add(antiGapcloser);
-                Gapcloser.Attach(veigar, "Anti-gapcloser settings");
+                //var antiGapcloser = new Menu("antiGapcloser", "Veigar anti-gapcloser spells")
+                //{
+                //    new MenuBool("e", "Anti-gapcloser E")
+                //};
+                //veigar.Add(antiGapcloser);
+                //Gapcloser.Attach(veigar, "Anti-gapcloser settings");
 
                 var drawings = new Menu("drawings", "Drawings");
                 {
@@ -110,7 +110,7 @@ namespace FrOnDaL_AIO.Champions
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
             Render.OnPresent += SpellDraw;
-            Gapcloser.OnGapcloser += AntiGapcloser;
+            //Gapcloser.OnGapcloser += AntiGapcloser;
             Misc.Orbwalker.PreAttack += OnPreAttack;
         }
   
@@ -453,36 +453,36 @@ namespace FrOnDaL_AIO.Champions
             }
         }
 
-        private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
-        {
-            if (target == null || !target.IsValidTarget(E.Range) || args.HaveShield) return;
+        //private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
+        //{
+        //    if (target == null || !target.IsValidTarget(E.Range) || args.HaveShield) return;
 
-            switch (args.Type)
-            {
-                case SpellType.SkillShot:
-                {
-                    if (target.IsValidTarget(300))
-                    {
-                        if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
-                        {
-                            E.Cast(target.Position.Extend(Player.ServerPosition, Vector3.Distance(target.Position, Player.Position) - 450));
-                            }
-                    }
-                }
-                    break;
-                case SpellType.Targeted:
-                {
-                    if (target.IsValidTarget(400))
-                    {
-                        if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
-                        {
-                            E.Cast(target.Position.Extend(Player.ServerPosition, Vector3.Distance(target.Position, Player.Position) - 450));
-                            }
-                    }
-                }
-                    break;
-            }
-        }
+        //    switch (args.Type)
+        //    {
+        //        case SpellType.SkillShot:
+        //        {
+        //            if (target.IsValidTarget(300))
+        //            {
+        //                if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
+        //                {
+        //                    E.Cast(target.Position.Extend(Player.ServerPosition, Vector3.Distance(target.Position, Player.Position) - 450));
+        //                    }
+        //            }
+        //        }
+        //            break;
+        //        case SpellType.Targeted:
+        //        {
+        //            if (target.IsValidTarget(400))
+        //            {
+        //                if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
+        //                {
+        //                    E.Cast(target.Position.Extend(Player.ServerPosition, Vector3.Distance(target.Position, Player.Position) - 450));
+        //                    }
+        //            }
+        //        }
+        //            break;
+        //    }
+        //}
 
         public static void OnPreAttack(object sender, PreAttackEventArgs args)
         {

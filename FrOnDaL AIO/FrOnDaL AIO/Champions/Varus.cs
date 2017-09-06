@@ -100,13 +100,13 @@ namespace FrOnDaL_AIO.Champions
                 };
                 varus.Add(jungleclear);
 
-                var antiGapcloser = new Menu("antiGapcloser", "Varus anti-gapcloser spells")
-                {
-                    new MenuBool("e", "Anti-gapcloser E"),
-                    new MenuBool("r", "Anti-gapcloser R")
-                };
-                varus.Add(antiGapcloser);
-                Gapcloser.Attach(varus, "Anti-gapcloser settings");
+                //var antiGapcloser = new Menu("antiGapcloser", "Varus anti-gapcloser spells")
+                //{
+                //    new MenuBool("e", "Anti-gapcloser E"),
+                //    new MenuBool("r", "Anti-gapcloser R")
+                //};
+                //varus.Add(antiGapcloser);
+                //Gapcloser.Attach(varus, "Anti-gapcloser settings");
                 var drawings = new Menu("drawings", "Drawings");
                 {
                     drawings.Add(new MenuBool("q", "Draw Q"));
@@ -130,7 +130,7 @@ namespace FrOnDaL_AIO.Champions
             Main.Attach();
             Game.OnUpdate += Game_OnUpdate;
             Misc.Orbwalker.PreAttack += OnPreAttack;
-            Gapcloser.OnGapcloser += AntiGapcloser;
+            //Gapcloser.OnGapcloser += AntiGapcloser;
             Render.OnPresent += DamageDraw;
             Render.OnPresent += SpellDraw;
             Misc.Orbwalker.PreAttack += (a, b) => IsPreAa = true;
@@ -375,53 +375,53 @@ namespace FrOnDaL_AIO.Champions
                 }
             }
         }
-        private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
-        {
-            if (target == null || !target.IsValidTarget(E.Range)) return;
+        //private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
+        //{
+        //    if (target == null || !target.IsValidTarget(E.Range)) return;
 
-            switch (args.Type)
-            {
-                case SpellType.Melee:
-                    if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && target.IsValidTarget(target.AttackRange + target.BoundingRadius + 100))
-                    {
-                        var rPred = R.GetPrediction(target);
-                        R.Cast(rPred.UnitPosition);
-                    }
-                    break;
-                case SpellType.Dash:
-                    if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && args.EndPosition.DistanceToPlayer() <= 350)
-                    {
-                        var rPred = R.GetPrediction(target);
-                        R.Cast(rPred.UnitPosition);
-                    }
-                    break;
-                case SpellType.SkillShot:
-                {
-                    if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
-                    {
-                        var ePred = E.GetPrediction(target);
+        //    switch (args.Type)
+        //    {
+        //        case SpellType.Melee:
+        //            if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && target.IsValidTarget(target.AttackRange + target.BoundingRadius + 100))
+        //            {
+        //                var rPred = R.GetPrediction(target);
+        //                R.Cast(rPred.UnitPosition);
+        //            }
+        //            break;
+        //        case SpellType.Dash:
+        //            if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && args.EndPosition.DistanceToPlayer() <= 350)
+        //            {
+        //                var rPred = R.GetPrediction(target);
+        //                R.Cast(rPred.UnitPosition);
+        //            }
+        //            break;
+        //        case SpellType.SkillShot:
+        //        {
+        //            if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
+        //            {
+        //                var ePred = E.GetPrediction(target);
 
-                        E.Cast(ePred.UnitPosition);
-                    }
-                    }
-                    break;
-                case SpellType.Targeted:
-                {
-                    if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && Game.TickCount > 2500)
-                    {
-                        var rPred = R.GetPrediction(target);
-                        R.Cast(rPred.UnitPosition);
-                    }     
-                    if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
-                    {
-                            var ePred = E.GetPrediction(target);
+        //                E.Cast(ePred.UnitPosition);
+        //            }
+        //            }
+        //            break;
+        //        case SpellType.Targeted:
+        //        {
+        //            if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && Game.TickCount > 2500)
+        //            {
+        //                var rPred = R.GetPrediction(target);
+        //                R.Cast(rPred.UnitPosition);
+        //            }     
+        //            if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
+        //            {
+        //                    var ePred = E.GetPrediction(target);
 
-                            E.Cast(ePred.UnitPosition);
-                    }              
-                }
-                    break;
-            }
-        }
+        //                    E.Cast(ePred.UnitPosition);
+        //            }              
+        //        }
+        //            break;
+        //    }
+        //}
         private static void OnPreAttack(object sender, PreAttackEventArgs args)
         {
             switch (Misc.Orbwalker.Mode)

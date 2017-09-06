@@ -109,14 +109,14 @@ namespace FrOnDaL_AIO.Champions
                 };
                 thresh.Add(jungleclear);
 
-                var antiGapcloser = new Menu("antiGapcloser", "Thresh anti-gapcloser spells")
-                {
-                    new MenuBool("w", "Anti-gapcloser W ally"),
-                    new MenuBool("w2", "Anti-gapcloser W thresh"),
-                    new MenuBool("e", "Anti-gapcloser E")
-                };
-                thresh.Add(antiGapcloser);
-                Gapcloser.Attach(thresh, "Anti-gapcloser settings");
+                //var antiGapcloser = new Menu("antiGapcloser", "Thresh anti-gapcloser spells")
+                //{
+                //    new MenuBool("w", "Anti-gapcloser W ally"),
+                //    new MenuBool("w2", "Anti-gapcloser W thresh"),
+                //    new MenuBool("e", "Anti-gapcloser E")
+                //};
+                //thresh.Add(antiGapcloser);
+                //Gapcloser.Attach(thresh, "Anti-gapcloser settings");
                 var drawings = new Menu("drawings", "Drawings");
                 {
                     drawings.Add(new MenuBool("q", "Draw Q"));
@@ -141,7 +141,7 @@ namespace FrOnDaL_AIO.Champions
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
             Misc.Orbwalker.PreAttack += OnPreAttack;
-            Gapcloser.OnGapcloser += AntiGapcloser;
+            //Gapcloser.OnGapcloser += AntiGapcloser;
         }
         private static bool IsQActive => Player.SpellBook.GetSpell(SpellSlot.Q).SpellData.Name == "threshQ";
         private static float QDamage(Obj_AI_Base d)
@@ -619,56 +619,56 @@ namespace FrOnDaL_AIO.Champions
             }
         }
 
-        private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
-        {
-            if (target == null) return;
+        //private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
+        //{
+        //    if (target == null) return;
 
-            switch (args.Type)
-            {
-                case SpellType.Dash:
-                    if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && args.EndPosition.DistanceToPlayer() <= 350 && target.IsValidTarget(E.Range))
-                    {
-                        var ePred = E.GetPrediction(target);
-                        E.Cast(ePred.UnitPosition);
-                    }
-                    break;
-                case SpellType.SkillShot:
-                {
-                    if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && target.IsValidTarget(E.Range))
-                    {
-                        E.Cast(target.Position);
-                    }
-                    if (Main["antiGapcloser"]["w2"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(W.Range) && Player.CountEnemyHeroesInRange(250) >= 1)
-                    {
-                        W.Cast(Player.Position);
-                    }
-                    }
-                    break;
-                case SpellType.Targeted:
-                {
-                    if (Main["antiGapcloser"]["w2"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(300))
-                    {
-                        W.Cast(Player.Position);
-                    }
-                    if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(W.Range + 550))
-                    {
-                        var allyHero = GameObjects.AllyHeroes.Where(ally => ally.Distance(Player) <= W.Range + 550 && !ally.IsMe)
-                            .OrderBy(ally => ally.Distance(args.EndPosition)).FirstOrDefault();
-                        if (allyHero != null)
-                        {
-                            CastW(allyHero.Position);
-                        }
-                    }
-                        if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500 && target.IsValidTarget(E.Range))
-                    {
-                        var ePred = E.GetPrediction(target);
+        //    switch (args.Type)
+        //    {
+        //        case SpellType.Dash:
+        //            if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && args.EndPosition.DistanceToPlayer() <= 350 && target.IsValidTarget(E.Range))
+        //            {
+        //                var ePred = E.GetPrediction(target);
+        //                E.Cast(ePred.UnitPosition);
+        //            }
+        //            break;
+        //        case SpellType.SkillShot:
+        //        {
+        //            if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && target.IsValidTarget(E.Range))
+        //            {
+        //                E.Cast(target.Position);
+        //            }
+        //            if (Main["antiGapcloser"]["w2"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(W.Range) && Player.CountEnemyHeroesInRange(250) >= 1)
+        //            {
+        //                W.Cast(Player.Position);
+        //            }
+        //            }
+        //            break;
+        //        case SpellType.Targeted:
+        //        {
+        //            if (Main["antiGapcloser"]["w2"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(300))
+        //            {
+        //                W.Cast(Player.Position);
+        //            }
+        //            if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(W.Range + 550))
+        //            {
+        //                var allyHero = GameObjects.AllyHeroes.Where(ally => ally.Distance(Player) <= W.Range + 550 && !ally.IsMe)
+        //                    .OrderBy(ally => ally.Distance(args.EndPosition)).FirstOrDefault();
+        //                if (allyHero != null)
+        //                {
+        //                    CastW(allyHero.Position);
+        //                }
+        //            }
+        //                if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500 && target.IsValidTarget(E.Range))
+        //            {
+        //                var ePred = E.GetPrediction(target);
 
-                        E.Cast(ePred.UnitPosition);
-                    }
-                }
-                    break;
-            }
-        }
+        //                E.Cast(ePred.UnitPosition);
+        //            }
+        //        }
+        //            break;
+        //    }
+        //}
         private static void CastW(Vector3 pos)
         {
             W.Cast(Player.Distance(pos) < W.Range ? pos : Player.Position.Extend(pos, W.Range));

@@ -90,13 +90,13 @@ namespace FrOnDaL_AIO.Champions
                 };
                 jhin.Add(jungleclear);
 
-                var antiGapcloser = new Menu("antiGapcloser", "Jhin anti-gapcloser spells")
-                {
-                    new MenuBool("w", "Anti-gapcloser W"),
-                    new MenuBool("e", "Anti-gapcloser E")
-                };
-                jhin.Add(antiGapcloser);
-                Gapcloser.Attach(jhin, "Anti-gapcloser settings");
+                //var antiGapcloser = new Menu("antiGapcloser", "Jhin anti-gapcloser spells")
+                //{
+                //    new MenuBool("w", "Anti-gapcloser W"),
+                //    new MenuBool("e", "Anti-gapcloser E")
+                //};
+                //jhin.Add(antiGapcloser);
+                //Gapcloser.Attach(jhin, "Anti-gapcloser settings");
                 var drawings = new Menu("drawings", "Drawings");
                 {
                     drawings.Add(new MenuBool("q", "Draw Q"));
@@ -122,7 +122,7 @@ namespace FrOnDaL_AIO.Champions
             Render.OnPresent += SpellDraw;
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
-            Gapcloser.OnGapcloser += AntiGapcloser;
+            //Gapcloser.OnGapcloser += AntiGapcloser;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }
       
@@ -530,53 +530,53 @@ namespace FrOnDaL_AIO.Champions
             //}
         }
 
-        private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
-        {
-            if (target == null || !target.IsValidTarget(E.Range) || args.HaveShield || IsCastingR()) return;
+        //private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
+        //{
+        //    if (target == null || !target.IsValidTarget(E.Range) || args.HaveShield || IsCastingR()) return;
 
-            switch (args.Type)
-            {
-                case SpellType.SkillShot:
-                {
-                    if (target.IsValidTarget(300))
-                    {
-                        if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
-                        {
-                            var ePred = E.GetPrediction(target);
+        //    switch (args.Type)
+        //    {
+        //        case SpellType.SkillShot:
+        //        {
+        //            if (target.IsValidTarget(300))
+        //            {
+        //                if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
+        //                {
+        //                    var ePred = E.GetPrediction(target);
 
-                            E.Cast(ePred.CastPosition);
-                        }
+        //                    E.Cast(ePred.CastPosition);
+        //                }
 
-                        if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.HasBuff("jhinespotteddebuff"))
-                        {
-                            var wPred = W.GetPrediction(target);
+        //                if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.HasBuff("jhinespotteddebuff"))
+        //                {
+        //                    var wPred = W.GetPrediction(target);
 
-                            W.Cast(wPred.UnitPosition);
-                        }
-                    }
-                }
-                    break;
-                case SpellType.Targeted:
-                {
-                    if (target.IsValidTarget(400))
-                    {
-                        if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
-                        {
-                            var ePred = E.GetPrediction(target);
+        //                    W.Cast(wPred.UnitPosition);
+        //                }
+        //            }
+        //        }
+        //            break;
+        //        case SpellType.Targeted:
+        //        {
+        //            if (target.IsValidTarget(400))
+        //            {
+        //                if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && Game.TickCount > 2500)
+        //                {
+        //                    var ePred = E.GetPrediction(target);
 
-                            E.Cast(ePred.CastPosition);
-                        }
+        //                    E.Cast(ePred.CastPosition);
+        //                }
 
-                        if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.HasBuff("jhinespotteddebuff"))
-                        {
-                            var wPred = W.GetPrediction(target);
-                            W.Cast(wPred.UnitPosition);
-                        }
-                    }
-                }
-                    break;
-            }
-        }
+        //                if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.HasBuff("jhinespotteddebuff"))
+        //                {
+        //                    var wPred = W.GetPrediction(target);
+        //                    W.Cast(wPred.UnitPosition);
+        //                }
+        //            }
+        //        }
+        //            break;
+        //    }
+        //}
      
         private static bool InCone(Vector3 position)
         {

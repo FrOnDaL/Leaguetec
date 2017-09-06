@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Champions\AurelionSol.cs" />
     <Compile Include="Champions\DrMundo.cs" />
     <Compile Include="Champions\JarvanIV.cs" />
     <Compile Include="Champions\Jhin.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Common\Utils\GameObjects.cs" />
     <Compile Include="Common\Utils\Invulnerable.cs" />
     <Compile Include="Common\Utils\Polygon.cs" />
+    <Compile Include="Common\Utils\PolygonEnemy.cs" />
     <Compile Include="Common\Utils\XyOffset.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

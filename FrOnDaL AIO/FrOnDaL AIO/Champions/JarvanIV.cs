@@ -84,12 +84,12 @@ namespace FrOnDaL_AIO.Champions
                 };
                 jarvan.Add(jungleclear);
 
-                var antiGapcloser = new Menu("antiGapcloser", "Jarvan IV anti-gapcloser spells")
-                {
-                    new MenuBool("w", "Anti-gapcloser W")
-                };
-                jarvan.Add(antiGapcloser);
-                Gapcloser.Attach(jarvan, "Anti-gapcloser settings");
+                //var antiGapcloser = new Menu("antiGapcloser", "Jarvan IV anti-gapcloser spells")
+                //{
+                //    new MenuBool("w", "Anti-gapcloser W")
+                //};
+                //jarvan.Add(antiGapcloser);
+                //Gapcloser.Attach(jarvan, "Anti-gapcloser settings");
                 var drawings = new Menu("drawings", "Drawings");
                 {
                     drawings.Add(new MenuBool("q", "Draw Q"));
@@ -114,7 +114,7 @@ namespace FrOnDaL_AIO.Champions
             Render.OnPresent += SpellDraw;
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
-            Gapcloser.OnGapcloser += AntiGapcloser;
+            //Gapcloser.OnGapcloser += AntiGapcloser;
         }
         private static void SpellDraw()
         {
@@ -404,13 +404,31 @@ namespace FrOnDaL_AIO.Champions
                 }
             }
         }
-        private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
-        {
-            if (target != null && Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(W.Range))
-            {
-                W.Cast();
-            }
-        }
+        //private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
+        //{
+        //    if (target == null || !target.IsValidTarget(E.Range) || args.HaveShield) return;
+
+        //    switch (args.Type)
+        //    {
+        //        case SpellType.SkillShot:
+        //        {
+        //            if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(W.Range))
+        //            {
+        //                W.Cast();
+        //            }
+        //            }
+        //            break;
+        //        case SpellType.Targeted:
+        //        {
+        //            if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && target.IsValidTarget(W.Range))
+        //            {
+        //                W.Cast();
+        //            }
+        //            }
+        //            break;
+        //    }
+            
+        //}
         private static void DamageDraw()
         {
             if (!Main["drawDamage"]["enabled"].Enabled) return;

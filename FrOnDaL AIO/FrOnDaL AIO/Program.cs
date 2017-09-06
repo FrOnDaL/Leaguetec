@@ -54,6 +54,10 @@ namespace FrOnDaL_AIO
                         var unused8 = new JarvanIv();
                         Console.WriteLine("FrOnDaL AIO Jarvan IV loaded");
                         break;
+                    case "AurelionSol":
+                        var unused9 = new AurelionSol();
+                        Console.WriteLine("FrOnDaL AIO AurelionSol loaded");
+                        break;
                 }
             }
             catch (Exception)

@@ -163,6 +163,54 @@ namespace FrOnDaL_AIO.Common
             }
             return false;
         }
+        public static MissileClient AurelionSolQMissile;
+        public static void SolOnCreate(GameObject obj)
+        {
+            var missile = obj as MissileClient;
+            if (missile == null)
+            {
+                return;
+            }
+
+            if (missile.SpellCaster == null || !missile.SpellCaster.IsValid ||
+                missile.SpellCaster.Team != ObjectManager.GetLocalPlayer().Team)
+            {
+                return;
+            }
+            var hero = missile.SpellCaster as Obj_AI_Hero;
+            if (hero == null)
+            {
+                return;
+            }
+            if (missile.SpellData.Name == "AurelionSolQMissile")
+            {
+                AurelionSolQMissile = missile;
+            }
+
+        }
+        public static void SolOnDestroy(GameObject obj)
+        {
+            var missile = obj as MissileClient;
+            if (missile == null || !missile.IsValid)
+            {
+                return;
+            }
+
+            if (missile.SpellCaster == null || !missile.SpellCaster.IsValid ||
+                missile.SpellCaster.Team != ObjectManager.GetLocalPlayer().Team)
+            {
+                return;
+            }
+            var hero = missile.SpellCaster as Obj_AI_Hero;
+            if (hero == null)
+            {
+                return;
+            }
+            if (missile.SpellData.Name == "AurelionSolQMissile")
+            {
+                AurelionSolQMissile = null;
+            }
+        }
         internal static float DistanceToPlayer(this Vector3 position)
         {
             return position.To2D().DistanceToPlayer();

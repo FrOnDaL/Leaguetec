@@ -102,12 +102,12 @@ namespace FrOnDaL_AIO.Champions
                 };
                 shen.Add(jungleclear);
 
-                var antiGapcloser = new Menu("antiGapcloser", "Shen anti-gapcloser spells")
-                {
-                    new MenuBool("e", "Anti-gapcloser E (Game Cursor Position)")
-                };
-                shen.Add(antiGapcloser);
-                Gapcloser.Attach(shen, "Anti-gapcloser settings");
+                //var antiGapcloser = new Menu("antiGapcloser", "Shen anti-gapcloser spells")
+                //{
+                //    new MenuBool("e", "Anti-gapcloser E (Game Cursor Position)")
+                //};
+                //shen.Add(antiGapcloser);
+                //Gapcloser.Attach(shen, "Anti-gapcloser settings");
                 var drawings = new Menu("drawings", "Drawings");
                 {
                     drawings.Add(new MenuBool("e", "Draw E"));
@@ -142,7 +142,7 @@ namespace FrOnDaL_AIO.Champions
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
             Render.OnPresent += AllyHealt;
-            Gapcloser.OnGapcloser += AntiGapcloser;
+            //Gapcloser.OnGapcloser += AntiGapcloser;
             Obj_AI_Base.OnProcessAutoAttack += AutoAttack;
         }
 
@@ -366,13 +366,33 @@ namespace FrOnDaL_AIO.Champions
             }
         }
 
-        private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
-        {
-            if (target != null && Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && target.IsValidTarget(E.Range))
-            {
-                E.Cast(Game.CursorPos);
-            }           
-        }
+        //private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
+        //{
+        //    if (target == null || !target.IsValidTarget(E.Range) || args.HaveShield) return;
+
+        //    switch (args.Type)
+        //    {
+        //        case SpellType.SkillShot:
+        //        {
+        //            if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready &&
+        //                target.IsValidTarget(E.Range))
+        //            {
+        //                E.Cast(Game.CursorPos);
+        //            }
+        //        }
+        //            break;
+        //        case SpellType.Targeted:
+        //        {
+        //            if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready &&
+        //                target.IsValidTarget(E.Range))
+        //            {
+        //                E.Cast(Game.CursorPos);
+        //            }
+        //        }
+        //            break;
+        //    }
+            
+        // }
 
         public static int GetProtection(string championName)
         {

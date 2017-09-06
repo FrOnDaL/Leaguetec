@@ -134,15 +134,15 @@ namespace FrOnDaL_AIO.Champions
                 };
                 lux.Add(jungleclear);
 
-                var antiGapcloser = new Menu("antiGapcloser", "Lux anti-gapcloser spells")
-                {
-                    new MenuBool("q", "Anti-gapcloser Q"),
-                    new MenuBool("w", "Anti-gapcloser W ally"),
-                    new MenuBool("w2", "Anti-gapcloser W lux"),
-                    new MenuBool("e", "Anti-gapcloser E")
-                };
-                lux.Add(antiGapcloser);
-                Gapcloser.Attach(lux, "Anti-gapcloser settings");
+                //var antiGapcloser = new Menu("antiGapcloser", "Lux anti-gapcloser spells")
+                //{
+                //    new MenuBool("q", "Anti-gapcloser Q"),
+                //    new MenuBool("w", "Anti-gapcloser W ally"),
+                //    new MenuBool("w2", "Anti-gapcloser W lux"),
+                //    new MenuBool("e", "Anti-gapcloser E")
+                //};
+                //lux.Add(antiGapcloser);
+                //Gapcloser.Attach(lux, "Anti-gapcloser settings");
                 var drawings = new Menu("drawings", "Drawings");
                 {
                     drawings.Add(new MenuBool("q", "Draw Q", false));
@@ -168,7 +168,7 @@ namespace FrOnDaL_AIO.Champions
             Render.OnPresent += SpellDraw;
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
-            Gapcloser.OnGapcloser += AntiGapcloser;
+            //Gapcloser.OnGapcloser += AntiGapcloser;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;       
 
         }
@@ -634,44 +634,93 @@ namespace FrOnDaL_AIO.Champions
             }              
         }
 
-        private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
-        {
-            if (target != null && Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && target.IsValidTarget(E.Range))
-            {
-                E.Cast(args.EndPosition);            
-            }
-            if (target != null && Main["antiGapcloser"]["q"].As<MenuBool>().Enabled && Q.Ready && target.IsValidTarget(Q.Range))
-            {
-                var rPred = Q.GetPrediction(target);
-                Q.Cast(rPred.UnitPosition);
-            }
-            if (target != null && Main["antiGapcloser"]["w2"].As<MenuBool>().Enabled && W.Ready &&
-                args.EndPosition.Distance(Player) < W.Range)
-            {
-                var isme2 = GameObjects.AllyHeroes.Where(ally => ally.Distance(Player) <= W.Range)
-                    .OrderBy(ally => ally.Distance(args.EndPosition)).FirstOrDefault();
-                if (isme2 != null && isme2.IsMe)
-                {
-                    foreach (var isme in GameObjects.AllyHeroes.Where(isme => isme.IsValid && !isme.IsDead && Player.ServerPosition.Distance(isme.ServerPosition) < W.Range && !isme.IsMe))
-                    {
-                        W.Cast(isme.ServerPosition);
-                    }
-                    if (Player.CountAllyHeroesInRange(W.Range) == 0)
-                    {
-                        W.Cast(Player.ServerPosition);
-                    }
-                }             
-            }
-            if (target != null && Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && args.EndPosition.Distance(Player) < W.Range)
-            {
-                var allyHero = GameObjects.AllyHeroes.Where(ally => ally.Distance(Player) <= W.Range && !ally.IsMe)
-                    .OrderBy(ally => ally.Distance(args.EndPosition)).FirstOrDefault();
-                if (allyHero != null)
-                {
-                    W.Cast(allyHero.Position);
-                }
-            }            
-        }
+        //private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
+        //{
+
+        //    if (target == null || !target.IsValidTarget(E.Range) || args.HaveShield) return;
+
+        //    switch (args.Type)
+        //    {
+        //        case SpellType.SkillShot:
+        //        {
+        //            if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && target.IsValidTarget(E.Range))
+        //            {
+        //                E.Cast(args.EndPosition);
+        //            }
+        //            if (Main["antiGapcloser"]["q"].As<MenuBool>().Enabled && Q.Ready && target.IsValidTarget(Q.Range))
+        //            {
+        //                var pred = Q.GetPrediction(target);
+        //                Q.Cast(pred.UnitPosition);
+        //            }
+        //            if (Main["antiGapcloser"]["w2"].As<MenuBool>().Enabled && W.Ready &&
+        //                args.EndPosition.Distance(Player) < W.Range)
+        //            {
+        //                var isme2 = GameObjects.AllyHeroes.Where(ally => ally.Distance(Player) <= W.Range)
+        //                    .OrderBy(ally => ally.Distance(args.EndPosition)).FirstOrDefault();
+        //                if (isme2 != null && isme2.IsMe)
+        //                {
+        //                    foreach (var isme in GameObjects.AllyHeroes.Where(isme => isme.IsValid && !isme.IsDead && Player.ServerPosition.Distance(isme.ServerPosition) < W.Range && !isme.IsMe))
+        //                    {
+        //                        W.Cast(isme.ServerPosition);
+        //                    }
+        //                    if (Player.CountAllyHeroesInRange(W.Range) == 0)
+        //                    {
+        //                        W.Cast(Player.ServerPosition);
+        //                    }
+        //                }
+        //            }
+        //            if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && args.EndPosition.Distance(Player) < W.Range)
+        //            {
+        //                var allyHero = GameObjects.AllyHeroes.Where(ally => ally.Distance(Player) <= W.Range && !ally.IsMe)
+        //                    .OrderBy(ally => ally.Distance(args.EndPosition)).FirstOrDefault();
+        //                if (allyHero != null)
+        //                {
+        //                    W.Cast(allyHero.Position);
+        //                }
+        //            }
+        //            }
+        //            break;
+        //        case SpellType.Targeted:
+        //        {
+        //            if (Main["antiGapcloser"]["e"].As<MenuBool>().Enabled && E.Ready && target.IsValidTarget(E.Range))
+        //            {
+        //                E.Cast(args.EndPosition);
+        //            }
+        //            if (Main["antiGapcloser"]["q"].As<MenuBool>().Enabled && Q.Ready && target.IsValidTarget(Q.Range))
+        //            {
+        //                var pred = Q.GetPrediction(target);
+        //                Q.Cast(pred.UnitPosition);
+        //            }
+        //            if (Main["antiGapcloser"]["w2"].As<MenuBool>().Enabled && W.Ready &&
+        //                args.EndPosition.Distance(Player) < W.Range)
+        //            {
+        //                var isme2 = GameObjects.AllyHeroes.Where(ally => ally.Distance(Player) <= W.Range)
+        //                    .OrderBy(ally => ally.Distance(args.EndPosition)).FirstOrDefault();
+        //                if (isme2 != null && isme2.IsMe)
+        //                {
+        //                    foreach (var isme in GameObjects.AllyHeroes.Where(isme => isme.IsValid && !isme.IsDead && Player.ServerPosition.Distance(isme.ServerPosition) < W.Range && !isme.IsMe))
+        //                    {
+        //                        W.Cast(isme.ServerPosition);
+        //                    }
+        //                    if (Player.CountAllyHeroesInRange(W.Range) == 0)
+        //                    {
+        //                        W.Cast(Player.ServerPosition);
+        //                    }
+        //                }
+        //            }
+        //            if (Main["antiGapcloser"]["w"].As<MenuBool>().Enabled && W.Ready && args.EndPosition.Distance(Player) < W.Range)
+        //            {
+        //                var allyHero = GameObjects.AllyHeroes.Where(ally => ally.Distance(Player) <= W.Range && !ally.IsMe)
+        //                    .OrderBy(ally => ally.Distance(args.EndPosition)).FirstOrDefault();
+        //                if (allyHero != null)
+        //                {
+        //                    W.Cast(allyHero.Position);
+        //                }
+        //            }
+        //            }
+        //            break;
+        //    }             
+        //}
 
         private static void DamageDraw()
         {
