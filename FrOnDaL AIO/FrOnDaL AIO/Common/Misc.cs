@@ -19,6 +19,7 @@ namespace FrOnDaL_AIO.Common
     {
         public static Spell Q { get; set; }
         public static Spell Q2 { get; set; }
+        public static Spell Q3 { get; set; }
         public static Spell W { get; set; }
         public static Spell W2 { get; set; }
         public static Spell E { get; set; }

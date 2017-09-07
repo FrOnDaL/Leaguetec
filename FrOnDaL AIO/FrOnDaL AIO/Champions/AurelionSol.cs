@@ -104,7 +104,7 @@ namespace FrOnDaL_AIO.Champions
             Game.OnUpdate += Game_OnUpdate;
             Render.OnPresent += DamageDraw;
             GameObject.OnCreate += SolOnCreate;
-            //Gapcloser.OnGapcloser += AntiGapcloser;
+           // Gapcloser.OnGapcloser += AntiGapcloser;
             Render.OnPresent += SpellDraw;
             GameObject.OnDestroy += SolOnDestroy;
             Misc.Orbwalker.PreAttack += OnPreAttack;
@@ -403,31 +403,33 @@ namespace FrOnDaL_AIO.Champions
         }
 
         //private static void AntiGapcloser(Obj_AI_Hero target, GapcloserArgs args)
-        //{
-        //    if (target == null || !target.IsValidTarget(E.Range) || args.HaveShield) return;
-
-        //    switch (args.Type)
+        //{          
+        //    if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && target != null && target.IsValidTarget(R.Range) && !args.HaveShield)
         //    {
-        //        case SpellType.SkillShot:
+        //        switch (args.Type)
         //        {
-        //            if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && target.IsValidTarget(Q.Range))
+        //            case SpellType.SkillShot:
         //            {
-        //                var pred = R.GetPrediction(target);
-        //                R.Cast(pred.UnitPosition);
+        //                if (target.IsValidTarget(300))
+        //                {
+        //                    var rPred = R.GetPrediction(target);
+        //                    R.Cast(rPred.UnitPosition);
+        //                }
         //            }
-        //            }
-        //            break;
-        //        case SpellType.Targeted:
-        //        {
-        //            if (Main["antiGapcloser"]["r"].As<MenuBool>().Enabled && R.Ready && target.IsValidTarget(Q.Range))
+        //                break;
+        //            case SpellType.Melee:
+        //            case SpellType.Dash:
+        //            case SpellType.Targeted:
         //            {
-        //                var pred = R.GetPrediction(target);
-        //                R.Cast(pred.UnitPosition);
+        //                if (target.IsValidTarget(400))
+        //                {
+        //                    var rPred = R.GetPrediction(target);
+        //                    R.Cast(rPred.UnitPosition);
+        //                }
         //            }
-        //            }
-        //            break;
+        //                break;
+        //        }
         //    }
-            
         //}
 
         private static void DamageDraw()

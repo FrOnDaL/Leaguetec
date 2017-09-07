@@ -58,6 +58,10 @@ namespace FrOnDaL_AIO
                         var unused9 = new AurelionSol();
                         Console.WriteLine("FrOnDaL AIO AurelionSol loaded");
                         break;
+                    //case "Ziggs":
+                    //    var unused10 = new Ziggs();
+                    //    Console.WriteLine("FrOnDaL AIO Ziggs loaded");
+                    //    break;
                 }
             }
             catch (Exception)

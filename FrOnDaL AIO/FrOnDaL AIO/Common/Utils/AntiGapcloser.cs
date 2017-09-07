@@ -1,16 +1,15 @@
-﻿using System;
-using Aimtec;
-using System.Linq;
+﻿using Aimtec;
 using Aimtec.SDK.Menu;
-using Aimtec.SDK.Extensions;
 using Aimtec.SDK.Menu.Components;
+using Aimtec.SDK.Extensions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+
 
 namespace FrOnDaL_AIO.Common.Utils
 {
-
     public delegate void OnGapcloserEvent(Obj_AI_Hero target, GapcloserArgs args);
-
     public enum SpellType
     {
         Melee = 0,
@@ -54,7 +53,7 @@ namespace FrOnDaL_AIO.Common.Utils
         {
             Initialize();
         }
-        
+
         private static void Initialize()
         {
             #region Aatrox
@@ -965,8 +964,7 @@ namespace FrOnDaL_AIO.Common.Utils
 
                 foreach (var spell in Spells.Where(x => x.ChampionName == enemy.ChampionName))
                 {
-                    heroMenu.Add(new MenuBool(
-                        "Gapcloser." + enemy.ChampionName.ToLower() + "." + spell.SpellName.ToLower(),
+                    heroMenu.Add(new MenuBool("Gapcloser." + enemy.ChampionName.ToLower() + "." + spell.SpellName.ToLower(),
                         "Anti Slot: " + spell.Slot + "(" + spell.SpellName + ")"));
                 }
             }
@@ -976,9 +974,7 @@ namespace FrOnDaL_AIO.Common.Utils
             Obj_AI_Base.OnProcessAutoAttack += OnProcessAutoAttack;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Obj_AI_Base.OnNewPath += OnNewPath;
-            
         }
-
 
         private static void OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs args)
         {
@@ -988,10 +984,8 @@ namespace FrOnDaL_AIO.Common.Utils
             }
 
             if (string.IsNullOrEmpty(args.SpellData.Name) || args.Target == null || !args.Target.IsMe ||
-                Menu["Gapcloser." + sender.UnitSkinName.ToLower()].As<Menu>()[
-                    "Gapcloser." + sender.UnitSkinName.ToLower() + ".Melee"] == null ||
-                !Menu["Gapcloser." + sender.UnitSkinName.ToLower()].As<Menu>()[
-                    "Gapcloser." + sender.UnitSkinName.ToLower() + ".Melee"].As<MenuSliderBool>().Enabled)
+                Menu["Gapcloser." + sender.UnitSkinName.ToLower()].As<Menu>()["Gapcloser." + sender.UnitSkinName.ToLower() + ".Melee"] == null ||
+                !Menu["Gapcloser." + sender.UnitSkinName.ToLower()].As<Menu>()["Gapcloser." + sender.UnitSkinName.ToLower() + ".Melee"].As<MenuSliderBool>().Enabled)
             {
                 return;
             }
@@ -1001,7 +995,7 @@ namespace FrOnDaL_AIO.Common.Utils
                 Gapclosers.Add(sender.NetworkId, new GapcloserArgs());
             }
 
-            Gapclosers[sender.NetworkId].Unit = (Obj_AI_Hero) sender;
+            Gapclosers[sender.NetworkId].Unit = (Obj_AI_Hero)sender;
             Gapclosers[sender.NetworkId].Slot = SpellSlot.Unknown;
             Gapclosers[sender.NetworkId].Type = SpellType.Melee;
             Gapclosers[sender.NetworkId].SpellName = args.SpellData.Name;
@@ -1017,8 +1011,7 @@ namespace FrOnDaL_AIO.Common.Utils
                 return;
             }
 
-            if (sender.UnitSkinName == "Vi" || sender.UnitSkinName == "Sion" || sender.UnitSkinName == "Kayn" ||
-                sender.UnitSkinName == "Fizz")
+            if (sender.UnitSkinName == "Vi" || sender.UnitSkinName == "Sion" || sender.UnitSkinName == "Kayn" || sender.UnitSkinName == "Fizz")
             {
                 // Vi R
                 // Sion R
@@ -1034,7 +1027,7 @@ namespace FrOnDaL_AIO.Common.Utils
 
             if (args.IsDash)
             {
-                Gapclosers[sender.NetworkId].Unit = (Obj_AI_Hero) sender;
+                Gapclosers[sender.NetworkId].Unit = (Obj_AI_Hero)sender;
                 Gapclosers[sender.NetworkId].Slot = SpellSlot.Unknown;
                 Gapclosers[sender.NetworkId].Type = SpellType.Dash;
                 Gapclosers[sender.NetworkId].SpellName = sender.UnitSkinName + "_Dash";
@@ -1045,8 +1038,7 @@ namespace FrOnDaL_AIO.Common.Utils
                     (int)
                     (Gapclosers[sender.NetworkId].EndPosition.DistanceSqr(Gapclosers[sender.NetworkId].StartPosition) /
                      args.Speed * args.Speed * 1000) + Gapclosers[sender.NetworkId].StartTick;
-                Gapclosers[sender.NetworkId].DurationTick =
-                    Gapclosers[sender.NetworkId].EndTick - Gapclosers[sender.NetworkId].StartTick;
+                Gapclosers[sender.NetworkId].DurationTick = Gapclosers[sender.NetworkId].EndTick - Gapclosers[sender.NetworkId].StartTick;
                 Gapclosers[sender.NetworkId].HaveShield = HaveShiledBuff(sender);
             }
         }
@@ -1058,8 +1050,7 @@ namespace FrOnDaL_AIO.Common.Utils
                 Gapclosers.Clear();
             }
 
-            if (OnGapcloser == null || Menu["Gapcloser.Enabled"].As<MenuBool>() == null ||
-                !Menu["Gapcloser.Enabled"].As<MenuBool>().Enabled)
+            if (OnGapcloser == null || Menu["Gapcloser.Enabled"].As<MenuBool>() == null || !Menu["Gapcloser.Enabled"].As<MenuBool>().Enabled)
             {
                 return;
             }
@@ -1068,8 +1059,7 @@ namespace FrOnDaL_AIO.Common.Utils
                 var args in
                 Gapclosers.Where(
                     x =>
-                        x.Value.Unit.IsValidTarget() && Menu["Gapcloser." + x.Value.Unit.ChampionName.ToLower()]
-                            .As<Menu>() != null &&
+                        x.Value.Unit.IsValidTarget() && Menu["Gapcloser." + x.Value.Unit.ChampionName.ToLower()].As<Menu>() != null &&
                         Menu["Gapcloser." + x.Value.Unit.ChampionName.ToLower()].As<Menu>()[
                             "Gapcloser." + x.Value.Unit.ChampionName.ToLower() + ".Enabled"].As<MenuBool>().Enabled))
             {
@@ -1077,16 +1067,13 @@ namespace FrOnDaL_AIO.Common.Utils
                 {
                     if (args.Value.Unit.ServerPosition.DistanceSqr(ObjectManager.GetLocalPlayer().ServerPosition) <=
                         Menu["Gapcloser." + args.Value.Unit.ChampionName.ToLower()].As<Menu>()[
-                                "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".Distance"].As<MenuSlider>()
-                            .Value *
+                            "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".Distance"].As<MenuSlider>().Value *
                         Menu["Gapcloser." + args.Value.Unit.ChampionName.ToLower()].As<Menu>()[
                             "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".Distance"].As<MenuSlider>().Value)
                     {
                         if (ObjectManager.GetLocalPlayer().HealthPercent() <=
                             Menu["Gapcloser." + args.Value.Unit.ChampionName.ToLower()].As<Menu>()[
-                                    "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".HPercent"]
-                                .As<MenuSlider>()
-                                .Value)
+                                "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".HPercent"].As<MenuSlider>().Value)
                         {
                             OnGapcloser(args.Value.Unit, args.Value);
                         }
@@ -1097,16 +1084,13 @@ namespace FrOnDaL_AIO.Common.Utils
                     if (args.Value.Type == SpellType.Dash &&
                         args.Value.EndPosition.DistanceSqr(ObjectManager.GetLocalPlayer().ServerPosition) <=
                         Menu["Gapcloser." + args.Value.Unit.ChampionName.ToLower()].As<Menu>()[
-                                "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".Distance"].As<MenuSlider>()
-                            .Value *
+                            "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".Distance"].As<MenuSlider>().Value *
                         Menu["Gapcloser." + args.Value.Unit.ChampionName.ToLower()].As<Menu>()[
                             "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".Distance"].As<MenuSlider>().Value)
                     {
                         if (ObjectManager.GetLocalPlayer().HealthPercent() <=
                             Menu["Gapcloser." + args.Value.Unit.ChampionName.ToLower()].As<Menu>()[
-                                    "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".HPercent"]
-                                .As<MenuSlider>()
-                                .Value)
+                                "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".HPercent"].As<MenuSlider>().Value)
                         {
                             OnGapcloser(args.Value.Unit, args.Value);
                         }
@@ -1125,8 +1109,7 @@ namespace FrOnDaL_AIO.Common.Utils
                 {
                     if (ObjectManager.GetLocalPlayer().HealthPercent() <=
                         Menu["Gapcloser." + args.Value.Unit.ChampionName.ToLower()].As<Menu>()[
-                                "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".Melee"].As<MenuSliderBool>()
-                            .Value)
+                            "Gapcloser." + args.Value.Unit.ChampionName.ToLower() + ".Melee"].As<MenuSliderBool>().Value)
                     {
                         OnGapcloser(args.Value.Unit, args.Value);
                     }
@@ -1147,8 +1130,7 @@ namespace FrOnDaL_AIO.Common.Utils
             if (Spells.All(
                     x => !string.Equals(x.SpellName, args.SpellData.Name, StringComparison.CurrentCultureIgnoreCase)) ||
                 !Menu["Gapcloser." + sender.UnitSkinName.ToLower()].As<Menu>()
-                    ["Gapcloser." + sender.UnitSkinName.ToLower() + "." + args.SpellData.Name.ToLower()].As<MenuBool>()
-                    .Enabled)
+                    ["Gapcloser." + sender.UnitSkinName.ToLower() + "." + args.SpellData.Name.ToLower()].As<MenuBool>().Enabled)
             {
                 return;
             }
@@ -1158,7 +1140,7 @@ namespace FrOnDaL_AIO.Common.Utils
                 Gapclosers.Add(sender.NetworkId, new GapcloserArgs());
             }
 
-            Gapclosers[sender.NetworkId].Unit = (Obj_AI_Hero) sender;
+            Gapclosers[sender.NetworkId].Unit = (Obj_AI_Hero)sender;
             Gapclosers[sender.NetworkId].Slot = args.SpellSlot;
             Gapclosers[sender.NetworkId].Type = args.Target != null ? SpellType.Targeted : SpellType.SkillShot;
             Gapclosers[sender.NetworkId].SpellName = args.SpellData.Name;
@@ -1207,11 +1189,5 @@ namespace FrOnDaL_AIO.Common.Utils
 
             return false;
         }
-
-
-       
-        
-
     }
-
 }

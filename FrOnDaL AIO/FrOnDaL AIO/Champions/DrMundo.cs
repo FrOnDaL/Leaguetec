@@ -270,7 +270,7 @@ namespace FrOnDaL_AIO.Champions
             {
                 if (target != null)
                 {
-                    if (Main["jungleclear"]["q"].As<MenuSliderBool>().Enabled && Player.HealthPercent() >= Main["jungleclear"]["q"].As<MenuSliderBool>().Value && Q.Ready)
+                    if (Main["jungleclear"]["q"].As<MenuSliderBool>().Enabled && Player.HealthPercent() >= Main["jungleclear"]["q"].As<MenuSliderBool>().Value && Q.Ready && !target.IsDead)
                     {
                         Q.Cast(target);
                     }
