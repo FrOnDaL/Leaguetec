@@ -266,7 +266,7 @@ namespace FrOnDaL_AIO.Champions
                     W.Cast();
              }
             
-            foreach (var target in GameObjects.Jungle.Where(x => !GameObjects.JungleSmall.Contains(x) && (GameObjects.JungleLarge.Contains(x) || GameObjects.JungleLegendary.Contains(x)) && x.IsValidTarget(900)))
+            foreach (var target in GameObjects.Jungle.Where(x => (GameObjects.JungleSmall.Contains(x) || GameObjects.JungleLarge.Contains(x) || GameObjects.JungleLegendary.Contains(x)) && x.IsValidTarget(900)))
             {
                 if (target != null)
                 {
