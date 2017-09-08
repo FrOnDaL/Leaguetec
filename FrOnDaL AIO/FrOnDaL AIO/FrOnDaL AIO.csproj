@@ -61,6 +61,7 @@
     <Compile Include="Champions\Thresh.cs" />
     <Compile Include="Champions\Varus.cs" />
     <Compile Include="Champions\Veigar.cs" />
+    <Compile Include="Champions\Ziggs.cs" />
     <Compile Include="Common\Misc.cs" />
     <Compile Include="Common\Utils\AntiGapcloser.cs" />
     <Compile Include="Common\Utils\Extensions.cs" />
