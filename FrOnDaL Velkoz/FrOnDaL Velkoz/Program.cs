@@ -6,6 +6,7 @@ namespace FrOnDaL_Velkoz
 {
     internal class Program
     {
+        
         private static void Main()
         {
             GameEvents.GameStart += OnLoadingComplete;

@@ -17,9 +17,9 @@ namespace FrOnDaL_Velkoz
 {
     internal class FrOnDaLVelkoz
     {
-        public static Menu Main = new Menu("Index", "FrOnDaL Vel'koz", true);
-        public static Orbwalker Orbwalker = new Orbwalker();
-        public static Obj_AI_Hero Velkoz => ObjectManager.GetLocalPlayer();
+        private static readonly Menu Main = new Menu("Index", "FrOnDaL Vel'koz", true);
+        private static readonly Orbwalker Orbwalker = new Orbwalker();
+        private static Obj_AI_Hero Velkoz => ObjectManager.GetLocalPlayer();
         private static Spell _q, _w, _e, _r;
 
         private static Vector3 _rCastPos;
@@ -27,17 +27,17 @@ namespace FrOnDaL_Velkoz
         {
             if (sender.IsMe && args.SpellSlot == SpellSlot.R) _rCastPos = sender.ServerPosition.Extend(args.End, _r.Range);
         }
-        public static bool IsQActive => Velkoz.SpellBook.GetSpell(SpellSlot.Q).SpellData.Name == "VelkozQ";
+        private static bool IsQActive => Velkoz.SpellBook.GetSpell(SpellSlot.Q).SpellData.Name == "VelkozQ";
         private static double RDamage(Obj_AI_Base d)
         {
             var damageR = Velkoz.CalculateDamage(d, DamageType.Magical, (float)new double[] { 450, 625, 800 }[Velkoz.SpellBook.GetSpell(SpellSlot.R).Level - 1] + Velkoz.TotalAbilityDamage / 100 * 125); return damageR;
         }
-        public static readonly List<string> SpecialChampions = new List<string> { "Annie", "Jhin" };
-        public static int SxOffset(Obj_AI_Hero target)
+        private static readonly List<string> SpecialChampions = new List<string> { "Annie", "Jhin" };
+        private static int SxOffset(Obj_AI_Hero target)
         {
             return SpecialChampions.Contains(target.ChampionName) ? 1 : 10;
         }
-        public static int SyOffset(Obj_AI_Hero target)
+        private static int SyOffset(Obj_AI_Hero target)
         {
             return SpecialChampions.Contains(target.ChampionName) ? 7 : 15;
         }
@@ -85,8 +85,8 @@ namespace FrOnDaL_Velkoz
             {
                 new MenuSliderBool("q", "Use Q / if Mana >= x%", false, 60, 0, 99),
                 new MenuSliderBool("w", "Use W / if Mana >= x%", true, 60, 0, 99),
-                new MenuSlider("UnitsWhit", "W Hit x Units minions >= x%", 3, 1, 6),
-                new MenuSliderBool("e", "Use E / if Mana >= x%", true, 60, 0, 99),
+                new MenuSlider("UnitsWhit", "W Hit x Units minions >= x%", 5, 1, 6),
+                new MenuSliderBool("e", "Use E / if Mana >= x%", false, 60, 0, 99),
                 new MenuSlider("UnitsEhit", "E Hit x Units minions >= x%", 3, 1, 4)
             };
             Main.Add(laneclear);
@@ -137,7 +137,7 @@ namespace FrOnDaL_Velkoz
             }
             if (Main["drawings"]["r"].As<MenuBool>().Enabled)
             {
-                Render.Circle(Velkoz.Position, _r.Range, 180, Color.Green);              
+                Render.Circle(Velkoz.Position, _r.Range, 180, Color.Green);
             }
         }
 
@@ -158,12 +158,13 @@ namespace FrOnDaL_Velkoz
                     Harass();
                     break;
             }
-
             if (_r.Ready && Main["combo"]["keyR"].As<MenuKeyBind>().Enabled)
             {
                 var target = TargetSelector.GetTarget(_r.Range);
-                if (target == null) return;            
-                    _r.Cast(target.Position);                             
+                if (target != null)
+                {
+                    _r.Cast(target.Position);
+                }         
             }
 
             if (_r.Ready && Main["combo"]["rKillSteal"].As<MenuBool>().Enabled)
@@ -176,87 +177,114 @@ namespace FrOnDaL_Velkoz
             }
 
             var followR = GameObjects.EnemyHeroes.OrderBy(t => t.Distance(_rCastPos)).FirstOrDefault(t => t.IsValidTarget(_r.Range));
-            if (Velkoz.SpellBook.IsChanneling && followR != null) 
+            if (Velkoz.SpellBook.IsChanneling && followR != null)
             {
-                Velkoz.SpellBook.UpdateChargedSpell(SpellSlot.R, followR.ServerPosition, false); 
+                Velkoz.SpellBook.UpdateChargedSpell(SpellSlot.R, followR.ServerPosition, false);
             }
         }
-
-
         /*Combo*/
         private static void Combo()
         {
-            foreach (var targetC in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(1500)))
+            var targetQ = TargetSelector.GetTarget(_q.Range);
+            if (targetQ != null)
             {
-                if (Main["combo"]["q"].As<MenuBool>().Enabled && _q.Ready && targetC.IsValidTarget(_q.Range))
+                if (Main["combo"]["q"].As<MenuBool>().Enabled && _q.Ready)
                 {
                     if (IsQActive)
                     {
-                        var prediction = _q.GetPrediction(targetC,Velkoz.Position);
-                        if (prediction.HitChance >= HitChance.High)
+                        var prediction = _q.GetPrediction(targetQ, Velkoz.Position);
+                        if (prediction.HitChance >= HitChance.Medium)
                         {
                             _q.Cast(prediction.CastPosition);
-                        }                     
+                        }
                     }
                 }
+            }
 
-                if (Main["combo"]["w"].As<MenuBool>().Enabled && _w.Ready && targetC.IsValidTarget(_w.Range))
+            var targetW = TargetSelector.GetTarget(_w.Range);
+            if (targetW != null)
+            {
+                if (Main["combo"]["w"].As<MenuBool>().Enabled && _w.Ready)
                 {
-                    var prediction = _w.GetPrediction(targetC, Velkoz.Position);
-                           if (prediction.HitChance >= HitChance.High)
-                           {
-                             _w.Cast(prediction.CastPosition);
-                           }
+                    var prediction = _w.GetPrediction(targetW, Velkoz.Position);
+                    if (prediction.HitChance >= HitChance.High)
+                    {
+                        _w.Cast(prediction.CastPosition);
+                    }
                 }
+            }
 
-                if (Main["combo"]["e"].As<MenuBool>().Enabled && _e.Ready && targetC.IsValidTarget(_e.Range))
+            var targetE = TargetSelector.GetTarget(_e.Range);
+            if (targetE != null)
+            {
+                if (Main["combo"]["e"].As<MenuBool>().Enabled && _e.Ready)
                 {
-                    var prediction = _e.GetPrediction(targetC, Velkoz.Position, targetC.Position - 100);
+                    var prediction = _e.GetPrediction(targetE, Velkoz.Position, targetE.Position);
                     if (prediction.HitChance >= HitChance.High)
                     {
                         _e.Cast(prediction.CastPosition);
                     }
                 }
-            }       
+            }
         }
-
+        /*ManuelR*/
+        private static void ManuelR()
+        {
+            if (_r.Ready && Main["combo"]["r"].As<MenuBool>().Enabled)
+            {
+                var target = TargetSelector.Implementation.GetOrderedTargets(_r.Range).FirstOrDefault(x => x.Health < RDamage(x));
+                if (target != null && Velkoz.Distance(target) > 350 && target.IsValidTarget(1300))
+                {
+                    _r.Cast(target.Position);
+                }
+            }
+        }
+        /*ManuelR*/
         /*Harass*/
         private static void Harass()
         {
-            foreach (var targetH in GameObjects.EnemyHeroes.Where(x => x.IsValidTarget(1500)))
+            var targetQ = TargetSelector.GetTarget(_q.Range);
+            if (targetQ != null)
             {
-                if (Main["harass"]["q"].As<MenuSliderBool>().Enabled && _q.Ready && targetH.IsValidTarget(_q.Range))
+                if (Main["harass"]["q"].As<MenuSliderBool>().Enabled && _q.Ready)
                 {
                     if (IsQActive)
                     {
-                        var prediction = _q.GetPrediction(targetH, Velkoz.Position);
+                        var prediction = _q.GetPrediction(targetQ, Velkoz.Position);
                         if (prediction.HitChance >= HitChance.High)
                         {
                             _q.Cast(prediction.CastPosition);
-                        }                                 
+                        }
                     }
                 }
+            }
 
-                if (Main["harass"]["w"].As<MenuSliderBool>().Enabled && _w.Ready && targetH.IsValidTarget(_w.Range))
+            var targetW = TargetSelector.GetTarget(_w.Range);
+            if (targetW != null)
+            {
+                if (Main["harass"]["w"].As<MenuSliderBool>().Enabled && _w.Ready)
                 {
-                   var prediction = _w.GetPrediction(targetH, Velkoz.Position);
-                           if (prediction.HitChance >= HitChance.High)
-                           {
-                             _w.Cast(prediction.CastPosition);
-                           }
+                    var prediction = _w.GetPrediction(targetW, Velkoz.Position);
+                    if (prediction.HitChance >= HitChance.High)
+                    {
+                        _w.Cast(prediction.CastPosition);
+                    }
                 }
+            }
 
-                if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && _e.Ready && targetH.IsValidTarget(_e.Range))
+            var targetE = TargetSelector.GetTarget(_e.Range);
+            if (targetE != null)
+            {
+                if (Main["harass"]["e"].As<MenuSliderBool>().Enabled && _e.Ready )
                 {
-                    var prediction = _e.GetPrediction(targetH, Velkoz.Position, targetH.Position - 100);
+                    var prediction = _e.GetPrediction(targetE, Velkoz.Position, targetE.Position - 100);
                     if (prediction.HitChance >= HitChance.High)
                     {
                         _e.Cast(prediction.CastPosition);
                     }
                 }
-            }       
+            }
         }
-
         /*Lane Clear*/
         private static void LaneClear()
         {
@@ -267,7 +295,7 @@ namespace FrOnDaL_Velkoz
                 {
                     var result = GetLinearLocation(_w.Range, _w.Width + 20);
                     if (result == null) continue;
-                    if (result.NumberOfMinionsHit >= Main["laneclear"]["UnitsWhit"].As<MenuSlider>().Value && !Velkoz.IsUnderEnemyTurret())
+                    if (result.NumberOfMinionsHit >= Main["laneclear"]["UnitsWhit"].As<MenuSlider>().Value && !Velkoz.IsUnderEnemyTurret() && _w.Ready)
                     {
                         _w.Cast(result.CastPosition);
                     }
@@ -275,7 +303,7 @@ namespace FrOnDaL_Velkoz
 
                 if (Main["laneclear"]["e"].As<MenuSliderBool>().Enabled && Velkoz.ManaPercent() >= Main["laneclear"]["e"].As<MenuSliderBool>().Value && _e.Ready && targetL.IsValidTarget(_e.Range))
                 {
-                   
+
                     if (GameObjects.EnemyMinions.Count(t => t.IsValidTarget(_e.Width + 20, false, false, _e.GetPrediction(targetL).CastPosition)) >= Main["laneclear"]["UnitsEhit"].As<MenuSlider>().Value && !Velkoz.IsUnderEnemyTurret())
                     {
                         _e.Cast(_e.GetPrediction(targetL).CastPosition);
@@ -299,6 +327,7 @@ namespace FrOnDaL_Velkoz
         {
             foreach (var targetJ in GameObjects.Jungle.Where(x => !GameObjects.JungleSmall.Contains(x) && (GameObjects.JungleLarge.Contains(x) || GameObjects.JungleLegendary.Contains(x)) && x.IsValidTarget(900)))
             {
+                
                 if (Main["jungleclear"]["w"].As<MenuSliderBool>().Enabled && Velkoz.ManaPercent() >= Main["jungleclear"]["w"].As<MenuSliderBool>().Value && _w.Ready)
                 {
                     _w.Cast(targetJ.Position);
@@ -316,47 +345,7 @@ namespace FrOnDaL_Velkoz
                 }
             }
         }
-
-        /*ManuelR*/
-        private static void ManuelR()
-        {
-            if (_r.Ready && Main["combo"]["r"].As<MenuBool>().Enabled)
-            {
-                var target = TargetSelector.Implementation.GetOrderedTargets(_r.Range).FirstOrDefault(x => x.Health < RDamage(x));
-                if (target != null && Velkoz.Distance(target) > 350 && target.IsValidTarget(1300))
-                {           
-                        _r.Cast(target.Position);                           
-                }
-            }         
-        }
-        /*ManuelR*/
-        public static void OnPreAttack(object sender, PreAttackEventArgs args)
-        {
-            switch (Orbwalker.Mode)
-            {
-
-                case OrbwalkingMode.Combo:
-                    if (Velkoz.HasBuff("VelkozR"))
-                    {
-                        args.Cancel = true;
-                    }
-                    if (Main["combo"]["disableAA"].As<MenuBool>().Enabled)
-                    {
-                        args.Cancel = true;
-                    }
-                    break;
-                case OrbwalkingMode.Mixed:          
-                case OrbwalkingMode.Lasthit:
-                case OrbwalkingMode.Laneclear:
-                    if (Velkoz.HasBuff("VelkozR"))
-                    {
-                        args.Cancel = true;
-                    }
-                    break;
-            }
-        }
-
-        /*Draw Damage Q*/
+        /*Draw Damage R*/
         private static void DamageDraw()
         {
             if (!Main["drawings"]["drawDamage"].Enabled || Velkoz.SpellBook.GetSpell(SpellSlot.R).Level <= 0) return;
@@ -373,7 +362,31 @@ namespace FrOnDaL_Velkoz
                 Render.Line(drawStartXPos, barPos.Y, drawEndXPos, barPos.Y, 9, true, enemy.Health < RDamage(enemy) ? Color.GreenYellow : Color.ForestGreen);
             }
         }
+        public static void OnPreAttack(object sender, PreAttackEventArgs args)
+        {
+            switch (Orbwalker.Mode)
+            {
 
+                case OrbwalkingMode.Combo:
+                    if (Velkoz.HasBuff("VelkozR"))
+                    {
+                        args.Cancel = true;
+                    }
+                    if (Main["combo"]["disableAA"].As<MenuBool>().Enabled)
+                    {
+                        args.Cancel = true;
+                    }
+                    break;
+                case OrbwalkingMode.Mixed:
+                case OrbwalkingMode.Lasthit:
+                case OrbwalkingMode.Laneclear:
+                    if (Velkoz.HasBuff("VelkozR"))
+                    {
+                        args.Cancel = true;
+                    }
+                    break;
+            }
+        }
         /*Polygon*/
         public abstract class Polygon
         {

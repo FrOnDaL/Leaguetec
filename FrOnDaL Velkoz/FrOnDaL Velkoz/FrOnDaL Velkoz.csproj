@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{28F75986-8A9C-4E2A-87FE-073CE1639536}</ProjectGuid>
+    <ProjectGuid>{4325FA25-DF3E-4467-9F95-69DDDE8ABD7C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FrOnDaL_Velkoz</RootNamespace>
@@ -35,10 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aimtec">
-      <HintPath>C:\Users\Frondal\AppData\Local\AimtecLoader\Data\System\Aimtec.dll</HintPath>
+      <HintPath>C:\Users\FrOnDaL\AppData\Local\AimtecLoader\Data\System\Aimtec.dll</HintPath>
     </Reference>
     <Reference Include="Aimtec.SDK">
-      <HintPath>C:\Users\Frondal\AppData\Local\AimtecLoader\Data\System\Aimtec.SDK.dll</HintPath>
+      <HintPath>C:\Users\FrOnDaL\AppData\Local\AimtecLoader\Data\System\Aimtec.SDK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,7 +47,9 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http">
+      <HintPath>C:\Users\FrOnDaL\AppData\Local\AimtecLoader\Data\System\System.Net.Http.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
