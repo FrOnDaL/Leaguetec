@@ -318,41 +318,44 @@ namespace Nefarious_Utility
                 {
                     continue;
                 }
-                if (t.WardName == "ZiggsE" && Menu["avoider"]["ziggsD"].As<MenuBool>().Enabled)
+                if (GameObjects.Heroes.FirstOrDefault(x => x.IsEnemy) != null)
                 {
-                    Render.Circle(t.Location, 65, 30, Color.Red);
-                }
-                if (t.WardName == "JinxE" && Menu["avoider"]["jinxD"].As<MenuBool>().Enabled)
-                {
-                    Render.Circle(t.Location, 70, 30, Color.Red);
-                }
-                if (Player.Distance(t.Location) < 200)
-                {
-                    if (t.WardName == "CaitlynYordleTrap" && Menu["avoider"]["caitlynW"].As<MenuBool>().Enabled)
+                    if (t.WardName == "ZiggsE" && Menu["avoider"]["ziggsD"].As<MenuBool>().Enabled)
                     {
-                        Avoid(t.Location, 180);
+                        Render.Circle(t.Location, 65, 30, Color.Red);
                     }
-                    if (t.WardName == "Bushwhack" && Menu["avoider"]["nidaleeW"].As<MenuBool>().Enabled)
+                    if (t.WardName == "JinxE" && Menu["avoider"]["jinxD"].As<MenuBool>().Enabled)
                     {
-                        Avoid(t.Location, 220);
+                        Render.Circle(t.Location, 70, 30, Color.Red);
                     }
-                    if (t.WardName == "TeemoRCast" && Menu["avoider"]["teemoR"].As<MenuBool>().Enabled)
+                    if (Player.Distance(t.Location) < 200)
                     {
-                        Avoid(t.Location, 220);
+                        if (t.WardName == "CaitlynYordleTrap" && Menu["avoider"]["caitlynW"].As<MenuBool>().Enabled)
+                        {
+                            Avoid(t.Location, 180);
+                        }
+                        if (t.WardName == "Bushwhack" && Menu["avoider"]["nidaleeW"].As<MenuBool>().Enabled)
+                        {
+                            Avoid(t.Location, 220);
+                        }
+                        if (t.WardName == "TeemoRCast" && Menu["avoider"]["teemoR"].As<MenuBool>().Enabled)
+                        {
+                            Avoid(t.Location, 220);
+                        }
+                        if (t.WardName == "JhinE" && Menu["avoider"]["jhinE"].As<MenuBool>().Enabled)
+                        {
+                            Avoid(t.Location, 250);
+                        }
+                        if (t.WardName == "ZiggsE" && Menu["avoider"]["ziggsE"].As<MenuBool>().Enabled)
+                        {
+                            Avoid(t.Location, 220);
+                        }
+                        if (t.WardName == "JinxE" && Menu["avoider"]["jinxE"].As<MenuBool>().Enabled)
+                        {
+                            Avoid(t.Location, 220);
+                        }
                     }
-                    if (t.WardName == "JhinE" && Menu["avoider"]["jhinE"].As<MenuBool>().Enabled)
-                    {
-                        Avoid(t.Location, 250);
-                    }
-                    if (t.WardName == "ZiggsE" && Menu["avoider"]["ziggsE"].As<MenuBool>().Enabled)
-                    {
-                        Avoid(t.Location, 220);
-                    }
-                    if (t.WardName == "JinxE" && Menu["avoider"]["jinxE"].As<MenuBool>().Enabled)
-                    {
-                        Avoid(t.Location, 220);
-                    }
-                }
+                }  
             }
             #endregion
         }
