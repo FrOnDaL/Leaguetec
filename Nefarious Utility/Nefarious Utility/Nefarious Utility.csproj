@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{023E2C49-474C-4950-BCB2-862D5F0E9019}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Nefarious_Utility</RootNamespace>
+    <AssemblyName>Nefarious Utility</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aimtec">
+      <HintPath>C:\Users\Frondal\AppData\Local\AimtecLoader\Data\System\Aimtec.dll</HintPath>
+    </Reference>
+    <Reference Include="Aimtec.SDK">
+      <HintPath>C:\Users\Frondal\AppData\Local\AimtecLoader\Data\System\Aimtec.SDK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http">
+      <HintPath>C:\Users\Frondal\AppData\Local\AimtecLoader\Data\System\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Tracker.cs" />
+    <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\Cd_Hud.png" />
+    <Content Include="Resources\ChampionIcons\Aatrox.png" />
+    <Content Include="Resources\ChampionIcons\Ahri.png" />
+    <Content Include="Resources\ChampionIcons\Akali.png" />
+    <Content Include="Resources\ChampionIcons\Alistar.png" />
+    <Content Include="Resources\ChampionIcons\Amumu.png" />
+    <Content Include="Resources\ChampionIcons\Anivia.png" />
+    <Content Include="Resources\ChampionIcons\Annie.png" />
+    <Content Include="Resources\ChampionIcons\Ashe.png" />
+    <Content Include="Resources\ChampionIcons\AurelionSol.png" />
+    <Content Include="Resources\ChampionIcons\Azir.png" />
+    <Content Include="Resources\ChampionIcons\Bard.png" />
+    <Content Include="Resources\ChampionIcons\Blitzcrank.png" />
+    <Content Include="Resources\ChampionIcons\Brand.png" />
+    <Content Include="Resources\ChampionIcons\Braum.png" />
+    <Content Include="Resources\ChampionIcons\Caitlyn.png" />
+    <Content Include="Resources\ChampionIcons\Camille.png" />
+    <Content Include="Resources\ChampionIcons\Cassiopeia.png" />
+    <Content Include="Resources\ChampionIcons\Chogath.png" />
+    <Content Include="Resources\ChampionIcons\Corki.png" />
+    <Content Include="Resources\ChampionIcons\Darius.png" />
+    <Content Include="Resources\ChampionIcons\Default.png" />
+    <Content Include="Resources\ChampionIcons\Diana.png" />
+    <Content Include="Resources\ChampionIcons\Draven.png" />
+    <Content Include="Resources\ChampionIcons\DrMundo.png" />
+    <Content Include="Resources\ChampionIcons\Ekko.png" />
+    <Content Include="Resources\ChampionIcons\Elise.png" />
+    <Content Include="Resources\ChampionIcons\Evelynn.png" />
+    <Content Include="Resources\ChampionIcons\Ezreal.png" />
+    <Content Include="Resources\ChampionIcons\FiddleSticks.png" />
+    <Content Include="Resources\ChampionIcons\Fiora.png" />
+    <Content Include="Resources\ChampionIcons\Fizz.png" />
+    <Content Include="Resources\ChampionIcons\Galio.png" />
+    <Content Include="Resources\ChampionIcons\Gangplank.png" />
+    <Content Include="Resources\ChampionIcons\Garen.png" />
+    <Content Include="Resources\ChampionIcons\Gnar.png" />
+    <Content Include="Resources\ChampionIcons\Gragas.png" />
+    <Content Include="Resources\ChampionIcons\Graves.png" />
+    <Content Include="Resources\ChampionIcons\Hecarim.png" />
+    <Content Include="Resources\ChampionIcons\Heimerdinger.png" />
+    <Content Include="Resources\ChampionIcons\Illaoi.png" />
+    <Content Include="Resources\ChampionIcons\Irelia.png" />
+    <Content Include="Resources\ChampionIcons\Ivern.png" />
+    <Content Include="Resources\ChampionIcons\Janna.png" />
+    <Content Include="Resources\ChampionIcons\JarvanIV.png" />
+    <Content Include="Resources\ChampionIcons\Jax.png" />
+    <Content Include="Resources\ChampionIcons\Jayce.png" />
+    <Content Include="Resources\ChampionIcons\Jhin.png" />
+    <Content Include="Resources\ChampionIcons\Jinx.png" />
+    <Content Include="Resources\ChampionIcons\Kalista.png" />
+    <Content Include="Resources\ChampionIcons\Karma.png" />
+    <Content Include="Resources\ChampionIcons\Karthus.png" />
+    <Content Include="Resources\ChampionIcons\Kassadin.png" />
+    <Content Include="Resources\ChampionIcons\Katarina.png" />
+    <Content Include="Resources\ChampionIcons\Kayle.png" />
+    <Content Include="Resources\ChampionIcons\Kayn.png" />
+    <Content Include="Resources\ChampionIcons\Kennen.png" />
+    <Content Include="Resources\ChampionIcons\Khazix.png" />
+    <Content Include="Resources\ChampionIcons\Kindred.png" />
+    <Content Include="Resources\ChampionIcons\Kled.png" />
+    <Content Include="Resources\ChampionIcons\KogMaw.png" />
+    <Content Include="Resources\ChampionIcons\Leblanc.png" />
+    <Content Include="Resources\ChampionIcons\LeeSin.png" />
+    <Content Include="Resources\ChampionIcons\Leona.png" />
+    <Content Include="Resources\ChampionIcons\Lissandra.png" />
+    <Content Include="Resources\ChampionIcons\Lucian.png" />
+    <Content Include="Resources\ChampionIcons\Lulu.png" />
+    <Content Include="Resources\ChampionIcons\Lux.png" />
+    <Content Include="Resources\ChampionIcons\Malphite.png" />
+    <Content Include="Resources\ChampionIcons\Malzahar.png" />
+    <Content Include="Resources\ChampionIcons\Maokai.png" />
+    <Content Include="Resources\ChampionIcons\MasterYi.png" />
+    <Content Include="Resources\ChampionIcons\MissFortune.png" />
+    <Content Include="Resources\ChampionIcons\MonkeyKing.png" />
+    <Content Include="Resources\ChampionIcons\Mordekaiser.png" />
+    <Content Include="Resources\ChampionIcons\Morgana.png" />
+    <Content Include="Resources\ChampionIcons\Nami.png" />
+    <Content Include="Resources\ChampionIcons\Nasus.png" />
+    <Content Include="Resources\ChampionIcons\Nautilus.png" />
+    <Content Include="Resources\ChampionIcons\Nidalee.png" />
+    <Content Include="Resources\ChampionIcons\Nocturne.png" />
+    <Content Include="Resources\ChampionIcons\Nunu.png" />
+    <Content Include="Resources\ChampionIcons\Olaf.png" />
+    <Content Include="Resources\ChampionIcons\Orianna.png" />
+    <Content Include="Resources\ChampionIcons\Ornn.png" />
+    <Content Include="Resources\ChampionIcons\Pantheon.png" />
+    <Content Include="Resources\ChampionIcons\Poppy.png" />
+    <Content Include="Resources\ChampionIcons\Quinn.png" />
+    <Content Include="Resources\ChampionIcons\Rakan.png" />
+    <Content Include="Resources\ChampionIcons\Rammus.png" />
+    <Content Include="Resources\ChampionIcons\RekSai.png" />
+    <Content Include="Resources\ChampionIcons\Renekton.png" />
+    <Content Include="Resources\ChampionIcons\Rengar.png" />
+    <Content Include="Resources\ChampionIcons\Riven.png" />
+    <Content Include="Resources\ChampionIcons\Rumble.png" />
+    <Content Include="Resources\ChampionIcons\Ryze.png" />
+    <Content Include="Resources\ChampionIcons\Sejuani.png" />
+    <Content Include="Resources\ChampionIcons\Shaco.png" />
+    <Content Include="Resources\ChampionIcons\Shen.png" />
+    <Content Include="Resources\ChampionIcons\Shyvana.png" />
+    <Content Include="Resources\ChampionIcons\Singed.png" />
+    <Content Include="Resources\ChampionIcons\Sion.png" />
+    <Content Include="Resources\ChampionIcons\Sivir.png" />
+    <Content Include="Resources\ChampionIcons\Skarner.png" />
+    <Content Include="Resources\ChampionIcons\Sona.png" />
+    <Content Include="Resources\ChampionIcons\Soraka.png" />
+    <Content Include="Resources\ChampionIcons\Swain.png" />
+    <Content Include="Resources\ChampionIcons\Syndra.png" />
+    <Content Include="Resources\ChampionIcons\TahmKench.png" />
+    <Content Include="Resources\ChampionIcons\Taliyah.png" />
+    <Content Include="Resources\ChampionIcons\Talon.png" />
+    <Content Include="Resources\ChampionIcons\Taric.png" />
+    <Content Include="Resources\ChampionIcons\Teemo.png" />
+    <Content Include="Resources\ChampionIcons\Thresh.png" />
+    <Content Include="Resources\ChampionIcons\Tristana.png" />
+    <Content Include="Resources\ChampionIcons\Trundle.png" />
+    <Content Include="Resources\ChampionIcons\Tryndamere.png" />
+    <Content Include="Resources\ChampionIcons\TwistedFate.png" />
+    <Content Include="Resources\ChampionIcons\Twitch.png" />
+    <Content Include="Resources\ChampionIcons\Udyr.png" />
+    <Content Include="Resources\ChampionIcons\Urgot.png" />
+    <Content Include="Resources\ChampionIcons\Varus.png" />
+    <Content Include="Resources\ChampionIcons\Vayne.png" />
+    <Content Include="Resources\ChampionIcons\Veigar.png" />
+    <Content Include="Resources\ChampionIcons\Velkoz.png" />
+    <Content Include="Resources\ChampionIcons\Vi.png" />
+    <Content Include="Resources\ChampionIcons\Viktor.png" />
+    <Content Include="Resources\ChampionIcons\Vladimir.png" />
+    <Content Include="Resources\ChampionIcons\Volibear.png" />
+    <Content Include="Resources\ChampionIcons\Warwick.png" />
+    <Content Include="Resources\ChampionIcons\Xayah.png" />
+    <Content Include="Resources\ChampionIcons\Xerath.png" />
+    <Content Include="Resources\ChampionIcons\XinZhao.png" />
+    <Content Include="Resources\ChampionIcons\Yasuo.png" />
+    <Content Include="Resources\ChampionIcons\Yorick.png" />
+    <Content Include="Resources\ChampionIcons\Zac.png" />
+    <Content Include="Resources\ChampionIcons\Zed.png" />
+    <Content Include="Resources\ChampionIcons\Ziggs.png" />
+    <Content Include="Resources\ChampionIcons\Zilean.png" />
+    <Content Include="Resources\ChampionIcons\Zoe.png" />
+    <Content Include="Resources\ChampionIcons\Zyra.png" />
+    <Content Include="Resources\Mini_Map_Pink.png" />
+    <Content Include="Resources\Mini_Map_Ward.png" />
+    <Content Include="Resources\SummonerSpells\SummonerBarrier.png" />
+    <Content Include="Resources\SummonerSpells\SummonerBoost.png" />
+    <Content Include="Resources\SummonerSpells\SummonerDot.png" />
+    <Content Include="Resources\SummonerSpells\SummonerExhaust.png" />
+    <Content Include="Resources\SummonerSpells\SummonerFlash.png" />
+    <Content Include="Resources\SummonerSpells\SummonerHaste.png" />
+    <Content Include="Resources\SummonerSpells\SummonerHeal.png" />
+    <Content Include="Resources\SummonerSpells\SummonerMana.png" />
+    <Content Include="Resources\SummonerSpells\SummonerSmite.png" />
+    <Content Include="Resources\SummonerSpells\SummonerSnowball.png" />
+    <Content Include="Resources\SummonerSpells\SummonerTeleport.png" />
+    <Content Include="Resources\Ulti_Side_Hud.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
