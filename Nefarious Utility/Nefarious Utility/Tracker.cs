@@ -41,13 +41,11 @@ namespace Nefarious_Utility
         public float StartRecallTime { get; set; }
         public float AbortRecallTime { get; set; }
         public float FinishRecallTime { get; set; }
-        public Texture Radar;
         public Texture HudSprite;
         public Texture MinimapSprite;
         public HeroInfo(Obj_AI_Hero hero)
         {
             Hero = hero;
-            Radar = Program.RadrarIcon(hero.ChampionName, Color.Red);
             HudSprite = Program.HudIcon(hero.ChampionName, Color.DarkGoldenrod, 100);
             MinimapSprite = Program.MinimapIcon(hero.ChampionName);
             IsJungler = hero.SpellBook.Spells.Any(spell => spell.Name.ToLower().Contains("smite"));

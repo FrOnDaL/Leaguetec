@@ -157,20 +157,6 @@ namespace Nefarious_Utility
             var finalSprite = new Texture(img);
             return finalSprite;
         }
-        public static Texture GetTexture(string name)
-        {
-            Texture sprite;
-            try
-            {
-                sprite = new Texture((Bitmap)Resources.ResourceManager.GetObject(name));
-            }
-            catch (Exception)
-            {
-                Console.WriteLine(@"Texture not found for " + name);
-                sprite = new Texture((Bitmap)Resources.ResourceManager.GetObject("Default"));
-            }
-            return sprite;
-        }
         public static Texture HudIcon(string name, Color color, int opacity = 60)
         {
             var srcBitmap = ResizeImage((Bitmap)Resources.ResourceManager.GetObject(name), new Size(42, 42));

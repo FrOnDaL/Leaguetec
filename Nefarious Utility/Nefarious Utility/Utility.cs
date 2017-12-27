@@ -2627,6 +2627,8 @@ namespace Nefarious_Utility
             return center.ToString();
         }
         #endregion
+
+        #region - Smite Damages -  
         private static int SmiteDamages
         {
             get
@@ -2635,6 +2637,7 @@ namespace Nefarious_Utility
                 return smite[Player.Level - 1];
             }
         }
+        #endregion
     }
 }
 
