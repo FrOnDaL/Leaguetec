@@ -14,6 +14,7 @@ using Spell = Aimtec.SDK.Spell;
 using Aimtec.SDK.TargetSelector;
 using System.Collections.Generic;
 using Aimtec.SDK.Menu.Components;
+using Aimtec.SDK.Prediction.Skillshots;
 using Color = System.Drawing.Color;
 using Rectangle = Aimtec.Rectangle;
 
@@ -32,7 +33,7 @@ namespace Nefarious_Utility
         private static bool LevelFull { get; set; }
         private static int _lvl1, _lvl2, _lvl3, _lvl4;
         private static int PlayerLevel => Player.Level + 1;
-        private static Font _font1, _font2, _font3, _font4, _font5;
+        private static Font _font1, _font2, _font3, _font4, _font5, _font6, _font7;
         private static Aimtec.Spell IsSmite => Player.SpellBook.Spells.Where(o => o?.SpellData != null).FirstOrDefault(o => o.SpellData.Name.Contains("Smite"));
         public Utility()
         {
@@ -213,7 +214,24 @@ namespace Nefarious_Utility
 
             }
             #endregion
-           
+
+            #region - Base Ulti -
+            var baseUlti = new Menu("baseUlti", "Base Ulti");
+            {
+                baseUlti.Add(new MenuKeyBind("baseUltiE", "Base ulti press U", KeyCode.U, KeybindType.Press));
+                baseUlti.Add(new MenuBool("baseUltiD", "Base ulti draw"));
+                var whiteListUlti = new Menu("whiteListUlti", "Ulti white list");
+                {
+                    foreach (var enemies in GameObjects.EnemyHeroes)
+                    {
+                        whiteListUlti.Add(new MenuBool("ulti" + enemies.ChampionName.ToLower(), enemies.ChampionName + " use ulti"));
+                    }
+                }
+                baseUlti.Add(whiteListUlti);
+                baseUlti.Add(new MenuSeperator("Seperator1", "No Collision"));
+            }
+            #endregion
+
             Menu.Add(enabled);
             Menu.Add(mapHack);
             Menu.Add(enemyClick);
@@ -225,7 +243,8 @@ namespace Nefarious_Utility
             Menu.Add(sideHud);
             Menu.Add(taRange);
             Menu.Add(avoider);
-            Menu.Add(gankAlerter);         
+            Menu.Add(gankAlerter);
+            Menu.Add(baseUlti);
             Q = new Spell(SpellSlot.Q);
             W = new Spell(SpellSlot.W);
             E = new Spell(SpellSlot.E);
@@ -237,6 +256,8 @@ namespace Nefarious_Utility
             _font3 = new Font("Tahoma", 11, 0) { Weight = FontWeight.Normal, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.AntiAliased };
             _font4 = new Font("Tahoma", 12, 0) { Weight = FontWeight.Normal, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.AntiAliased };
             _font5 = new Font("Tahoma", 13, 0) { Weight = FontWeight.Normal, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.AntiAliased };
+            _font6 = new Font("Calibri", 13, 6) { Weight = FontWeight.Normal, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.NonAntiAliased };
+            _font7 = new Font("Calibri", 13, 6) { Weight = FontWeight.Bold, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.NonAntiAliased };
             #endregion
             Game.OnUpdate += GameOnUpdate;
             Obj_AI_Base.OnLevelUp += On_Level_Up;
@@ -939,6 +960,115 @@ namespace Nefarious_Utility
                     if (hero.Hero.IsAlly && hero.Hero.IsVisible && !hero.Hero.IsMe && Menu["taRange"]["aaA"].As<MenuBool>().Enabled)
                     {
                         Render.Circle(hero.Hero.Position, attackRange, 180, Player.Distance(hero.Hero) < attackRange ? Color.FromArgb(150, Color.Red) : Color.FromArgb(150, Color.ForestGreen));
+                    }
+                }
+                #endregion
+
+                #region - Base Ulti -
+                if (Menu["baseUlti"]["baseUltiE"].As<MenuKeyBind>().Enabled || Menu["baseUlti"]["baseUltiD"].As<MenuBool>().Enabled && hero.Hero.IsEnemy)
+                {
+                    var secondsLeft = hero.RecallEnd + hero.RecallTime - Game.ClockTime;
+                    var secondsPassed = hero.RecallTime - secondsLeft;
+                    var percent = secondsPassed / hero.RecallTime * 100;
+                    var delay = 0;
+                    var speed = 0;
+                    if (Player.ChampionName == "Ashe")
+                    {
+                        R.SetSkillshot(250, 130, 1600, true, SkillshotType.Line);
+                        delay = 250;
+                        speed = 1600;
+                    }
+                    if (Player.ChampionName == "Draven")
+                    {
+                        R.SetSkillshot(300, 160, 2000, true, SkillshotType.Line);
+                        delay = 300;
+                        speed = 2000;
+                    }
+                    if (Player.ChampionName == "Ezreal")
+                    {
+                        R.SetSkillshot(1000, 160, 2000, false, SkillshotType.Line);
+                        delay = 160;
+                        speed = 2000;
+                    }
+                    if (Player.ChampionName == "Jinx")
+                    {
+                        R.SetSkillshot(500, 140, 2200, true, SkillshotType.Line);
+                        delay = 140;
+                        speed = 2200;
+                    }
+                    const int baseultiBarWidth = 220;
+                    var baseultiStartX = Render.Width / 2 - baseultiBarWidth / 2;
+                    var baseultiStartY = Render.Height - 157;
+                    Vector3 xy;
+                    if (Game.Type == GameType.Normal && Player.Team == GameObjectTeam.Order)
+                    {
+                        xy = new Vector3(14340, 171.9777f, 14390);
+                    }
+                    else if (Game.Type == GameType.Normal && Player.Team == GameObjectTeam.Chaos)
+                    {
+                        xy = new Vector3(396, 185.1325f, 462);
+                    }
+                    else
+                    {
+                        xy = Vector3.Zero;
+                    }
+
+                    var travelTime = Player.Distance(xy) / speed * 1000 + delay + Game.Ping / 2f;
+                    var castTime = (int)(-(hero.TickCount - (hero.Start + hero.Duration)) - travelTime);
+                    var castUltiTime = (int)(-(Game.TickCount - (hero.Start + hero.Duration)) - travelTime);
+                    if (Game.ClockTime - hero.StartRecallTime < hero.RecallTime && !hero.Abort)
+                    {
+                        if (Game.ClockTime >= 10)
+                        {
+                            if (Player.GetSpellDamage(hero.Hero, SpellSlot.R) < hero.Hero.Health + 50 && Menu["baseUlti"]["baseUltiD"].As<MenuBool>().Enabled)
+                            {
+                                DrawRect(baseultiStartX, baseultiStartY, 222 - 222 * (percent / 100), 7, 1, Color.FromArgb((int)(100f * 1f), Color.White));
+                                DrawRect(baseultiStartX + 221 - 221 * (percent / 100), baseultiStartY - 7, 1, 6, 2, Color.FromArgb((int)(255f * 1f), Color.White));
+                                RenderFontText1(_font6, hero.Hero.ChampionName, new Vector2(baseultiStartX + 221 - 221 * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2, baseultiStartY - 19), Color.WhiteSmoke);
+                            }                           
+                            var barY = Render.Height * 0.8f;
+                            const int barHeight = 6;
+                            var barX = Render.Width * 0.580f;
+                            var barWidth = Render.Width - 2 * barX;
+                            var scale = barWidth / 8000;
+                            if (Player.GetSpellDamage(hero.Hero, SpellSlot.R) > hero.Hero.Health + 50)
+                            {
+                                if (Menu["baseUlti"]["baseUltiD"].As<MenuBool>().Enabled)
+                                {
+                                    if (castTime >= 0)
+                                    {
+                                        if (Player.ChampionName == "Ashe" || Player.ChampionName == "Draven" ||                         Player.ChampionName == "Ezreal" || Player.ChampionName == "Jinx")
+                                        {
+                                            Render.Rectangle(barX + scale * castTime, barY + 5 + barHeight - 7, 2, 10,                      Color.Orange);
+                                        }
+                                    }
+
+                                    DrawRect(baseultiStartX, baseultiStartY, 222 - 222 * (percent / 100), 7, 1, Color.FromArgb(255, Color.Red));
+                                    DrawRect(baseultiStartX + 221 - 221 * (percent / 100), baseultiStartY + 9, 1, 7, 2, Color.FromArgb((int)(255f * 1f), Color.Orange));
+                                    RenderFontText1(_font7, hero.Hero.ChampionName, new Vector2(baseultiStartX + 221 - 221 * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2, baseultiStartY + 18), Color.DarkOrange);
+                                }
+                                if (castUltiTime <= Game.Ping && Menu["baseUlti"]["baseUltiE"].As<MenuKeyBind>().Enabled)
+                                {
+                                    if (Menu["baseUlti"]["ulti" + hero.Hero.ChampionName.ToLower()].As<MenuBool>().Enabled)
+                                    {
+                                        R.Cast(xy);
+                                    }
+                                }
+                            }
+
+                            if (Menu["baseUlti"]["baseUltiD"].As<MenuBool>().Enabled)
+                            {
+                                /*Zemin*/
+                                DrawRect(baseultiStartX, baseultiStartY, 222, 7, 1, Color.FromArgb((int)(40f * 1f), Color.White));
+                                /*Zemin*/
+                                /*Çerçeve*/
+                                DrawRect(baseultiStartX, baseultiStartY - 1, 222, 1, 1, Color.FromArgb((int)(255f * 1f), Color.White));
+                                DrawRect(baseultiStartX, baseultiStartY + 7, 222, 1, 1, Color.FromArgb((int)(255f * 1f), Color.White));
+                                DrawRect(baseultiStartX, baseultiStartY, 1, 7, 1, Color.FromArgb((int)(255f * 1f), Color.White));
+                                DrawRect(baseultiStartX + 221, baseultiStartY, 1, 7, 1, Color.FromArgb((int)(255f * 1f), Color.White));
+                                /*Çerçeve*/
+                            }
+                        }
                     }
                 }
                 #endregion
@@ -2638,6 +2768,11 @@ namespace Nefarious_Utility
             }
         }
         #endregion
+        public static void DrawRect(float x, float y, float width, int height, float thickness, Color color)
+        {
+            for (var i = 0; i < height; i++)
+                Render.Line(x, y + i, x + width, y + i, thickness, true, color);
+        }
     }
 }
 

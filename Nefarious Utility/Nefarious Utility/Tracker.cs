@@ -41,6 +41,9 @@ namespace Nefarious_Utility
         public float StartRecallTime { get; set; }
         public float AbortRecallTime { get; set; }
         public float FinishRecallTime { get; set; }
+        public float Start { get; set; }
+        public float Duration { get; set; }
+        public float TickCount { get; set; }
         public Texture HudSprite;
         public Texture MinimapSprite;
         public HeroInfo(Obj_AI_Hero hero)
@@ -246,6 +249,9 @@ namespace Nefarious_Utility
                 switch (args.Status)
                 {
                     case TeleportStatus.Start:
+                        championInfoOne.Start = args.Start;
+                        championInfoOne.Duration = args.Duration;
+                        championInfoOne.TickCount = Game.TickCount;
                         championInfoOne.StartRecallTime = Game.ClockTime;
                         championInfoOne.RecallEnd = Game.ClockTime;
                         championInfoOne.Abort = false;
