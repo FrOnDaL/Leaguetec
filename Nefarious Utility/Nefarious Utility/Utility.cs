@@ -33,7 +33,7 @@ namespace Nefarious_Utility
         private static bool LevelFull { get; set; }
         private static int _lvl1, _lvl2, _lvl3, _lvl4;
         private static int PlayerLevel => Player.Level + 1;
-        private static Font _font1, _font2, _font3, _font4, _font5, _font6, _font7;
+        private static Font _font1, _font2, _font3, _font4, _font5, _font6, _font7, _font8;
         private static Aimtec.Spell IsSmite => Player.SpellBook.Spells.Where(o => o?.SpellData != null).FirstOrDefault(o => o.SpellData.Name.Contains("Smite"));
         public Utility()
         {
@@ -48,6 +48,7 @@ namespace Nefarious_Utility
                 mapHack.Add(new MenuBool("mapE", "Enabled"));
                 mapHack.Add(new MenuBool("mapCircle", "Draw circle minimap"));
                 mapHack.Add(new MenuBool("mapLine", "Draw Line minimap"));
+                mapHack.Add(new MenuBool("visableT", "Last visable time", false));
             }
             #endregion
 
@@ -229,6 +230,7 @@ namespace Nefarious_Utility
                 }
                 baseUlti.Add(whiteListUlti);
                 baseUlti.Add(new MenuSeperator("Seperator1", "No Collision"));
+                baseUlti.Add(new MenuSlider("scalingB", "Scaling", 0, 0, 200));
                 baseUlti.Add(new MenuSeperator("Seperator2", "Rectangle X and Y offset"));
                 baseUlti.Add(new MenuSlider("xOffsetB", "X Offset", 0, 0, 1000));
                 baseUlti.Add(new MenuBool("invertXB", "Invert X"));
@@ -236,6 +238,7 @@ namespace Nefarious_Utility
                 baseUlti.Add(new MenuBool("invertYB", "Invert Y"));
             }
             #endregion
+
 
             Menu.Add(enabled);
             Menu.Add(mapHack);
@@ -263,6 +266,7 @@ namespace Nefarious_Utility
             _font5 = new Font("Tahoma", 13, 0) { Weight = FontWeight.Normal, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.AntiAliased };
             _font6 = new Font("Calibri", 13, 6) { Weight = FontWeight.Normal, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.NonAntiAliased };
             _font7 = new Font("Calibri", 13, 6) { Weight = FontWeight.Bold, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.NonAntiAliased };
+            _font8 = new Font("Tahoma", 13, 0) { Weight = FontWeight.Normal, OutputPrecision = FontOutputPrecision.Default, Quality = FontQuality.AntiAliased };
             #endregion
             Game.OnUpdate += GameOnUpdate;
             Obj_AI_Base.OnLevelUp += On_Level_Up;
@@ -442,10 +446,18 @@ namespace Nefarious_Utility
                             }   
                         }
                         hero.MinimapSprite.Draw(enemylastPos + new Vector2(-11, -11));
-                        hero.MinimapSprite.Draw(enemylastPos + new Vector2(-11, -11), Color.FromArgb(40, 0, 0, 0));
+                        hero.MinimapSprite.Draw(enemylastPos + new Vector2(-11, -11),
+                            Menu["mapHack"]["visableT"].As<MenuBool>().Enabled
+                                ? Color.FromArgb(115, 0, 0, 0)
+                                : Color.FromArgb(40, 0, 0, 0));
+
                         if (Game.ClockTime - hero.StartRecallTime < hero.RecallTime && !hero.Abort)
                         {
                             DrawCircleOnMinimap(hero.LastVisablePos, 890, Color.Yellow, 1);
+                        }
+                        if (Menu["mapHack"]["visableT"].As<MenuBool>().Enabled)
+                        {
+                            RenderFontText1(_font8, Math.Floor(hero.SecondsSinceSeen) > 240 || Math.Abs(Math.Floor(hero.SecondsSinceSeen)) <= 0 ? " " : TextCenter(hero.SecondsSinceSeen), enemylastPos + new Vector2(-7, -6), Color.White);
                         }
                     }
                 }
@@ -1028,9 +1040,15 @@ namespace Nefarious_Utility
                         {
                             if (Player.GetSpellDamage(hero.Hero, SpellSlot.R) < hero.Hero.Health + 50 && Menu["baseUlti"]["baseUltiD"].As<MenuBool>().Enabled)
                             {
-                                DrawRect(baseultiStartX, baseultiStartY, 222 - 222 * (percent / 100), 7, 1, Color.FromArgb((int)(100f * 1f), Color.White));
-                                DrawRect(baseultiStartX + 221 - 221 * (percent / 100), baseultiStartY - 7, 1, 6, 2, Color.FromArgb((int)(255f * 1f), Color.White));
-                                RenderFontText1(_font6, hero.Hero.ChampionName, new Vector2(baseultiStartX + 221 - 221 * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2, baseultiStartY - 19), Color.WhiteSmoke);
+                                var w1 = 222 + Menu["baseUlti"]["scalingB"].Value - (222 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100);
+                                var h1 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                DrawRect(baseultiStartX, baseultiStartY, w1, h1, 1, Color.FromArgb((int)(100f * 1f), Color.White));
+
+                                var w2 = 221 + Menu["baseUlti"]["scalingB"].Value - (221 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100);
+                                DrawRect(baseultiStartX + w2, baseultiStartY - 7, 1, 6, 2, Color.FromArgb((int)(255f * 1f), Color.White));
+                                
+                                var w3 = 221 + Menu["baseUlti"]["scalingB"].Value - (221 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2;
+                                RenderFontText1(_font6, hero.Hero.ChampionName, new Vector2(baseultiStartX + w3, baseultiStartY - 19), Color.WhiteSmoke);
                             }                           
                             var barY = (Menu["baseUlti"]["invertYB"].Enabled ? -Menu["baseUlti"]["yOffsetB"].Value : Menu["baseUlti"]["yOffsetB"].Value) + (Render.Height * 0.8f);
                             const int barHeight = 6;
@@ -1045,13 +1063,22 @@ namespace Nefarious_Utility
                                     {
                                         if (Player.ChampionName == "Ashe" || Player.ChampionName == "Draven" ||                         Player.ChampionName == "Ezreal" || Player.ChampionName == "Jinx")
                                         {
-                                            Render.Rectangle((Menu["baseUlti"]["invertXB"].Enabled ? -Menu["baseUlti"]["xOffsetB"].Value : Menu["baseUlti"]["xOffsetB"].Value) + barX + scale * castTime, barY + 5 + barHeight - 7, 2, 10,                      Color.Orange);
+                                            Render.Rectangle(
+                                                (Menu["baseUlti"]["invertXB"].Enabled ? -Menu["baseUlti"]["xOffsetB"].Value : Menu["baseUlti"]["xOffsetB"].Value) + Menu["baseUlti"]["scalingB"].Value + barX + scale * castTime,
+                                                barY + 5 + barHeight - 7 + (float)Menu["baseUlti"]["scalingB"].Value / 4, 
+                                                2, 10, Color.Orange);
                                         }
                                     }
+                                    var w1 = 222 + Menu["baseUlti"]["scalingB"].Value - (222 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100);
+                                    var h1 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                    DrawRect(baseultiStartX, baseultiStartY, w1, h1, 1, Color.FromArgb(255, Color.Red));
 
-                                    DrawRect(baseultiStartX, baseultiStartY, 222 - 222 * (percent / 100), 7, 1, Color.FromArgb(255, Color.Red));
-                                    DrawRect(baseultiStartX + 221 - 221 * (percent / 100), baseultiStartY + 9, 1, 7, 2, Color.FromArgb((int)(255f * 1f), Color.Orange));
-                                    RenderFontText1(_font7, hero.Hero.ChampionName, new Vector2(baseultiStartX + 221 - 221 * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2, baseultiStartY + 18), Color.DarkOrange);
+                                    var w2 = 221 + Menu["baseUlti"]["scalingB"].Value - (221 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100);
+                                    DrawRect(baseultiStartX + w2, baseultiStartY + 9 + (float)Menu["baseUlti"]["scalingB"].Value / 4, 1, 7, 2, Color.FromArgb((int)(255f * 1f), Color.Orange));
+
+                                    var w3 = 221 + Menu["baseUlti"]["scalingB"].Value - (221 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2;
+                                    RenderFontText1(_font7, hero.Hero.ChampionName, new Vector2(baseultiStartX + w3, baseultiStartY + 18 + (float)Menu["baseUlti"]["scalingB"].Value / 4), Color.DarkOrange);
+
                                 }
                                 if (castUltiTime <= Game.Ping && Menu["baseUlti"]["baseUltiE"].As<MenuKeyBind>().Enabled)
                                 {
@@ -1065,13 +1092,24 @@ namespace Nefarious_Utility
                             if (Menu["baseUlti"]["baseUltiD"].As<MenuBool>().Enabled)
                             {
                                 /*Zemin*/
-                                DrawRect(baseultiStartX, baseultiStartY, 222, 7, 1, Color.FromArgb((int)(40f * 1f), Color.White));
+                                var w4 = 222 + Menu["baseUlti"]["scalingB"].Value;
+                                var h4 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                DrawRect(baseultiStartX, baseultiStartY, w4, h4, 1, Color.FromArgb((int)(40f * 1f), Color.White));
                                 /*Zemin*/
                                 /*Çerçeve*/
-                                DrawRect(baseultiStartX, baseultiStartY - 1, 222, 1, 1, Color.FromArgb((int)(255f * 1f), Color.White));
-                                DrawRect(baseultiStartX, baseultiStartY + 7, 222, 1, 1, Color.FromArgb((int)(255f * 1f), Color.White));
-                                DrawRect(baseultiStartX, baseultiStartY, 1, 7, 1, Color.FromArgb((int)(255f * 1f), Color.White));
-                                DrawRect(baseultiStartX + 221, baseultiStartY, 1, 7, 1, Color.FromArgb((int)(255f * 1f), Color.White));
+                                var w5 = 222 + Menu["baseUlti"]["scalingB"].Value;
+                                DrawRect(baseultiStartX, baseultiStartY - 1, w5, 1, 1, Color.FromArgb((int)(255f * 1f), Color.White));
+
+                                var w6 = 222 + Menu["baseUlti"]["scalingB"].Value;
+                                var h6 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                DrawRect(baseultiStartX, baseultiStartY + h6, w6, 1, 1, Color.FromArgb((int)(255f * 1f), Color.White));
+
+                                var h7 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                DrawRect(baseultiStartX, baseultiStartY, 1, h7, 1, Color.FromArgb((int)(255f * 1f), Color.White));
+
+                                var w8 = 221 + Menu["baseUlti"]["scalingB"].Value;
+                                var h8 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                DrawRect(baseultiStartX + w8, baseultiStartY, 1, h8, 1, Color.FromArgb((int)(255f * 1f), Color.White));
                                 /*Çerçeve*/
                             }
                         }
