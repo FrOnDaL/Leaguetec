@@ -229,6 +229,11 @@ namespace Nefarious_Utility
                 }
                 baseUlti.Add(whiteListUlti);
                 baseUlti.Add(new MenuSeperator("Seperator1", "No Collision"));
+                baseUlti.Add(new MenuSeperator("Seperator2", "Rectangle X and Y offset"));
+                baseUlti.Add(new MenuSlider("xOffsetB", "X Offset", 0, 0, 1000));
+                baseUlti.Add(new MenuBool("invertXB", "Invert X"));
+                baseUlti.Add(new MenuSlider("yOffsetB", "Y Offset", 0, 0, 1000));
+                baseUlti.Add(new MenuBool("invertYB", "Invert Y"));
             }
             #endregion
 
@@ -997,8 +1002,9 @@ namespace Nefarious_Utility
                         speed = 2200;
                     }
                     const int baseultiBarWidth = 220;
-                    var baseultiStartX = Render.Width / 2 - baseultiBarWidth / 2;
-                    var baseultiStartY = Render.Height - 157;
+                    var baseultiStartX = (Menu["baseUlti"]["invertXB"].Enabled ? -Menu["baseUlti"]["xOffsetB"].Value : Menu["baseUlti"]["xOffsetB"].Value) + (Render.Width / 2 - baseultiBarWidth / 2);
+                    var baseultiStartY = (Menu["baseUlti"]["invertYB"].Enabled ? -Menu["baseUlti"]["yOffsetB"].Value : Menu["baseUlti"]["yOffsetB"].Value) + (Render.Height - 157);
+
                     Vector3 xy;
                     if (Game.Type == GameType.Normal && Player.Team == GameObjectTeam.Order)
                     {
@@ -1026,11 +1032,11 @@ namespace Nefarious_Utility
                                 DrawRect(baseultiStartX + 221 - 221 * (percent / 100), baseultiStartY - 7, 1, 6, 2, Color.FromArgb((int)(255f * 1f), Color.White));
                                 RenderFontText1(_font6, hero.Hero.ChampionName, new Vector2(baseultiStartX + 221 - 221 * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2, baseultiStartY - 19), Color.WhiteSmoke);
                             }                           
-                            var barY = Render.Height * 0.8f;
+                            var barY = (Menu["baseUlti"]["invertYB"].Enabled ? -Menu["baseUlti"]["yOffsetB"].Value : Menu["baseUlti"]["yOffsetB"].Value) + (Render.Height * 0.8f);
                             const int barHeight = 6;
                             var barX = Render.Width * 0.580f;
                             var barWidth = Render.Width - 2 * barX;
-                            var scale = barWidth / 8000;
+                            var scale =  barWidth / 8000;
                             if (Player.GetSpellDamage(hero.Hero, SpellSlot.R) > hero.Hero.Health + 50)
                             {
                                 if (Menu["baseUlti"]["baseUltiD"].As<MenuBool>().Enabled)
@@ -1039,7 +1045,7 @@ namespace Nefarious_Utility
                                     {
                                         if (Player.ChampionName == "Ashe" || Player.ChampionName == "Draven" ||                         Player.ChampionName == "Ezreal" || Player.ChampionName == "Jinx")
                                         {
-                                            Render.Rectangle(barX + scale * castTime, barY + 5 + barHeight - 7, 2, 10,                      Color.Orange);
+                                            Render.Rectangle((Menu["baseUlti"]["invertXB"].Enabled ? -Menu["baseUlti"]["xOffsetB"].Value : Menu["baseUlti"]["xOffsetB"].Value) + barX + scale * castTime, barY + 5 + barHeight - 7, 2, 10,                      Color.Orange);
                                         }
                                     }
 
