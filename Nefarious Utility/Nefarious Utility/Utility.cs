@@ -1015,7 +1015,7 @@ namespace Nefarious_Utility
                     }
                     const int baseultiBarWidth = 220;
                     var baseultiStartX = (Menu["baseUlti"]["invertXB"].Enabled ? -Menu["baseUlti"]["xOffsetB"].Value : Menu["baseUlti"]["xOffsetB"].Value) + (Render.Width / 2 - baseultiBarWidth / 2);
-                    var baseultiStartY = (Menu["baseUlti"]["invertYB"].Enabled ? -Menu["baseUlti"]["yOffsetB"].Value : Menu["baseUlti"]["yOffsetB"].Value) + (Render.Height - 157);
+                    var baseultiStartY = (Menu["baseUlti"]["invertYB"].Enabled ? -Menu["baseUlti"]["yOffsetB"].Value : Menu["baseUlti"]["yOffsetB"].Value) + (Render.Height - 157) - 35;
 
                     Vector3 xy;
                     if (Game.Type == GameType.Normal && Player.Team == GameObjectTeam.Order)
@@ -1050,7 +1050,7 @@ namespace Nefarious_Utility
                                 var w3 = 221 + Menu["baseUlti"]["scalingB"].Value - (221 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2;
                                 RenderFontText1(_font6, hero.Hero.ChampionName, new Vector2(baseultiStartX + w3, baseultiStartY - 19), Color.WhiteSmoke);
                             }                           
-                            var barY = (Menu["baseUlti"]["invertYB"].Enabled ? -Menu["baseUlti"]["yOffsetB"].Value : Menu["baseUlti"]["yOffsetB"].Value) + (Render.Height * 0.8f);
+                            var barY = (Menu["baseUlti"]["invertYB"].Enabled ? -Menu["baseUlti"]["yOffsetB"].Value : Menu["baseUlti"]["yOffsetB"].Value) + (Render.Height * 0.8f) - 35;
                             const int barHeight = 6;
                             var barX = Render.Width * 0.580f;
                             var barWidth = Render.Width - 2 * barX;
