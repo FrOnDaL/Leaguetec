@@ -1041,7 +1041,7 @@ namespace Nefarious_Utility
                             if (Player.GetSpellDamage(hero.Hero, SpellSlot.R) < hero.Hero.Health + 50 && Menu["baseUlti"]["baseUltiD"].As<MenuBool>().Enabled)
                             {
                                 var w1 = 222 + Menu["baseUlti"]["scalingB"].Value - (222 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100);
-                                var h1 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                var h1 = 7 + Menu["baseUlti"]["scalingB"].Value / 20;
                                 DrawRect(baseultiStartX, baseultiStartY, w1, h1, 1, Color.FromArgb((int)(100f * 1f), Color.White));
 
                                 var w2 = 221 + Menu["baseUlti"]["scalingB"].Value - (221 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100);
@@ -1065,19 +1065,19 @@ namespace Nefarious_Utility
                                         {
                                             Render.Rectangle(
                                                 (Menu["baseUlti"]["invertXB"].Enabled ? -Menu["baseUlti"]["xOffsetB"].Value : Menu["baseUlti"]["xOffsetB"].Value) + Menu["baseUlti"]["scalingB"].Value + barX + scale * castTime,
-                                                barY + 5 + barHeight - 7 + (float)Menu["baseUlti"]["scalingB"].Value / 4, 
+                                                barY + 5 + barHeight - 7 + (float)Menu["baseUlti"]["scalingB"].Value / 20, 
                                                 2, 10, Color.Orange);
                                         }
                                     }
                                     var w1 = 222 + Menu["baseUlti"]["scalingB"].Value - (222 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100);
-                                    var h1 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                    var h1 = 7 + Menu["baseUlti"]["scalingB"].Value / 20;
                                     DrawRect(baseultiStartX, baseultiStartY, w1, h1, 1, Color.FromArgb(255, Color.Red));
 
                                     var w2 = 221 + Menu["baseUlti"]["scalingB"].Value - (221 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100);
-                                    DrawRect(baseultiStartX + w2, baseultiStartY + 9 + (float)Menu["baseUlti"]["scalingB"].Value / 4, 1, 7, 2, Color.FromArgb((int)(255f * 1f), Color.Orange));
+                                    DrawRect(baseultiStartX + w2, baseultiStartY + 9 + (float)Menu["baseUlti"]["scalingB"].Value / 20, 1, 7, 2, Color.FromArgb((int)(255f * 1f), Color.Orange));
 
                                     var w3 = 221 + Menu["baseUlti"]["scalingB"].Value - (221 + Menu["baseUlti"]["scalingB"].Value) * (percent / 100) - (float)hero.Hero.ChampionName.Length * _font6.Width / 2;
-                                    RenderFontText1(_font7, hero.Hero.ChampionName, new Vector2(baseultiStartX + w3, baseultiStartY + 18 + (float)Menu["baseUlti"]["scalingB"].Value / 4), Color.DarkOrange);
+                                    RenderFontText1(_font7, hero.Hero.ChampionName, new Vector2(baseultiStartX + w3, baseultiStartY + 18 + (float)Menu["baseUlti"]["scalingB"].Value / 20), Color.DarkOrange);
 
                                 }
                                 if (castUltiTime <= Game.Ping && Menu["baseUlti"]["baseUltiE"].As<MenuKeyBind>().Enabled)
@@ -1093,7 +1093,7 @@ namespace Nefarious_Utility
                             {
                                 /*Zemin*/
                                 var w4 = 222 + Menu["baseUlti"]["scalingB"].Value;
-                                var h4 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                var h4 = 7 + Menu["baseUlti"]["scalingB"].Value / 20;
                                 DrawRect(baseultiStartX, baseultiStartY, w4, h4, 1, Color.FromArgb((int)(40f * 1f), Color.White));
                                 /*Zemin*/
                                 /*Çerçeve*/
@@ -1101,14 +1101,14 @@ namespace Nefarious_Utility
                                 DrawRect(baseultiStartX, baseultiStartY - 1, w5, 1, 1, Color.FromArgb((int)(255f * 1f), Color.White));
 
                                 var w6 = 222 + Menu["baseUlti"]["scalingB"].Value;
-                                var h6 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                var h6 = 7 + Menu["baseUlti"]["scalingB"].Value / 20;
                                 DrawRect(baseultiStartX, baseultiStartY + h6, w6, 1, 1, Color.FromArgb((int)(255f * 1f), Color.White));
 
-                                var h7 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                var h7 = 7 + Menu["baseUlti"]["scalingB"].Value / 20;
                                 DrawRect(baseultiStartX, baseultiStartY, 1, h7, 1, Color.FromArgb((int)(255f * 1f), Color.White));
 
                                 var w8 = 221 + Menu["baseUlti"]["scalingB"].Value;
-                                var h8 = 7 + Menu["baseUlti"]["scalingB"].Value / 4;
+                                var h8 = 7 + Menu["baseUlti"]["scalingB"].Value / 20;
                                 DrawRect(baseultiStartX + w8, baseultiStartY, 1, h8, 1, Color.FromArgb((int)(255f * 1f), Color.White));
                                 /*Çerçeve*/
                             }
